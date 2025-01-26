@@ -4,6 +4,7 @@ import 'package:ewaste/pages/UserHomePage.dart';
 import 'package:ewaste/pages/VolunteerHomePage.dart';
 import 'package:ewaste/pages/dropImage.dart';
 import 'package:ewaste/pages/login.dart';
+import 'package:ewaste/pages/register.dart';
 import 'package:ewaste/services/auth_gate.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,7 +28,7 @@ class Ewaste extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: DropImagePage(),
+      home: RegisterPage(),
     );
   }
 }

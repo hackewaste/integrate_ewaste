@@ -33,19 +33,37 @@ class AuthService {
   }
 
   //sign up
-  Future<UserCredential> signUpWithEmailPassword(String email, password, role) async {
+  // ...existing code...
+
+  //sign up
+  Future<UserCredential> signUpWithEmailPassword(
+      String email, password, role) async {
     try {
       //create user
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
-//save user info in a sep doc
-      await _firestore.collection("Users").doc(userCredential.user!.uid).set(
-        {
-          'uid': userCredential.user!.uid,
-          'email': email,
-          'role': role,
-        },
-      );
+
+      //save user info in the appropriate collection
+      if (role == 'user') {
+        await _firestore.collection("Users").doc(userCredential.user!.uid).set(
+          {
+            'uid': userCredential.user!.uid,
+            'email': email,
+            'role': role,
+          },
+        );
+      } else {
+        await _firestore
+            .collection("Volunteers")
+            .doc(userCredential.user!.uid)
+            .set(
+          {
+            'uid': userCredential.user!.uid,
+            'email': email,
+            'role': role,
+          },
+        );
+      }
 
       return userCredential;
     } on FirebaseAuthException catch (e) {
@@ -53,10 +71,29 @@ class AuthService {
     }
   }
 
+  // ...existing code... Future<UserCredential> signUpWithEmailPassword(String email, password, role) async {
+
+//     try {
+//       //create user
+//       UserCredential userCredential = await _auth
+//           .createUserWithEmailAndPassword(email: email, password: password);
+// //save user info in a sep doc
+//       await _firestore.collection("Users").doc(userCredential.user!.uid).set(
+//         {
+//           'uid': userCredential.user!.uid,
+//           'email': email,
+//           'role': role,
+//         },
+//       );
+
+//       return userCredential;
+//     } on FirebaseAuthException catch (e) {
+//       throw Exception(e.code);
+//     }
+//   }
+
   //sign out
   Future<void> signOut() async {
     return await _auth.signOut();
   }
-
-  //errors
 }

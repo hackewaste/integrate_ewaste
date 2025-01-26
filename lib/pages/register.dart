@@ -1,3 +1,4 @@
+import 'package:ewaste/pages/userHomePage.dart';
 import 'package:ewaste/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +26,10 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       // Navigate to login page
-      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => UserHomePage()),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Registration Failed: ${e.toString()}")),
