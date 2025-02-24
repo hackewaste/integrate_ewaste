@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ewaste/pages/pickupfinal.dart';
 import 'credits.dart';
+import 'package:ewaste/pages/model_waiting.dart';
 
 
 class DropImagePage extends StatefulWidget {
@@ -264,6 +265,17 @@ Future<void> _sendImagesToBackend() async {
       _detectionResults.clear();
     });
 
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing the dialog
+      builder: (BuildContext context) {
+        return Dialog(
+          child: ProcessingScreen(),
+        );
+      },
+    );
+
     final url = Uri.parse('http://192.168.0.114:5000/predict');
     final request = http.MultipartRequest('POST', url);
 
@@ -319,7 +331,6 @@ Future<void> _sendImagesToBackend() async {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('You earned $totalCredits credits!')),
       );
-
     } else {
       setState(() {
         _detectionResults.add({'error': 'Error: ${response.reasonPhrase}'});
@@ -330,8 +341,9 @@ Future<void> _sendImagesToBackend() async {
       _detectionResults.add({'error': 'Error connecting to backend: $e'});
     });
   } finally {
+    Navigator.pop(context); // Close the loading dialog
     setState(() {
-      _isProcessing = false;
+      _isProcessing = false; // Update processing state
     });
   }
 }
