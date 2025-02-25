@@ -53,11 +53,6 @@ class OrderSummaryPage extends StatelessWidget {
               'Assistance Required: ${assistanceRequired ? "Yes" : "No"}',
             ]),
 
-            // Payment Details Section
-            _buildSectionTitle('Payment Details'),
-            _buildDetailsCard([
-              'Payment Mode: $paymentMode',
-            ]),
 
             // Edit and Confirm Buttons
             Row(

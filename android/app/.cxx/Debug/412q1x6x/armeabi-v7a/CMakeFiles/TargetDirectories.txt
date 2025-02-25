@@ -1,2 +1,0 @@
-F:/FlutterProjects/integrate_ewaste/android/app/.cxx/Debug/412q1x6x/armeabi-v7a/CMakeFiles/edit_cache.dir
-F:/FlutterProjects/integrate_ewaste/android/app/.cxx/Debug/412q1x6x/armeabi-v7a/CMakeFiles/rebuild_cache.dir

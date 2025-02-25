@@ -1,3 +1,4 @@
+import 'package:ewaste/presentations/user/home/widgets/didyouknow.dart';
 import 'package:ewaste/presentations/volunteer/bottom_navbar_volunteer.dart';
 import 'package:ewaste/presentations/volunteer/appbar_volunteer.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class _VolunteerHomePage extends State<VolunteerHomePage> {
       appBar: AppbarVolunteer(),
       drawer: const Drawer(),
       body: SingleChildScrollView(
+
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -64,6 +66,7 @@ class _VolunteerHomePage extends State<VolunteerHomePage> {
                 ),
               ),
               const SizedBox(height: 24.0),
+              RecyclingProcessCard(),
 
               // Announcements Section
               SectionHeader(title: 'Announcements'),
