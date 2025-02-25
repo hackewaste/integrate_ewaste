@@ -127,17 +127,6 @@ class _PickupRequestPageState extends State<PickupRequestPage> {
     );
 
     // Navigate to the confirmation page
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => FinalPickupPage(
-          requestId: widget.requestId,
-          selectedDate: selectedDate,
-          selectedTime: selectedTime,
-          totalCredits: _totalCredits,
-        ),
-      ),
-    );
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Error: $e')),

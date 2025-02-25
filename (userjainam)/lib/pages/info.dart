@@ -427,11 +427,7 @@ class FAQPage extends StatelessWidget {
           Center(
             child: ElevatedButton.icon(
               onPressed: _launchWhatsApp,
-              icon: Image.asset(
-                'assets/whatsapp_logo.png', // Ensure you have this image in your assets folder
-                height: 24,
-                width: 24,
-              ),
+              icon: const Icon(Icons.chat, color: Colors.white),
               label: const Text(
                 'Connect with us on WhatsApp',
                 style: TextStyle(color: Colors.white, fontSize: 16),

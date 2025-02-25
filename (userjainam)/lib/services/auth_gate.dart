@@ -22,7 +22,7 @@ class AuthGate extends StatelessWidget {
           if (userEmail.endsWith('@volunteer.com')) {
             return const VolunteerHomePage();
           } else {
-            return const UserHomepage();
+            return const UserHomepage(title: 'user homepage',);
           }
         }
 

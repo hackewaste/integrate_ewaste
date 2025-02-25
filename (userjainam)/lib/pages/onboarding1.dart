@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'onboarding2.dart'; // Import the next onboarding page
 
 class GamificationScreen extends StatelessWidget {
   @override
@@ -26,7 +27,6 @@ class GamificationScreen extends StatelessWidget {
                   Expanded(
                     child: Stack(
                       children: [
-                        // Decorative leaves
                         Positioned(
                           left: 0,
                           bottom: 100,
@@ -36,10 +36,9 @@ class GamificationScreen extends StatelessWidget {
                             width: 100,
                           ),
                         ),
-                        // Main illustration
                         Center(
                           child: Image.asset(
-                            'assets/rewards.png', // Add your reward image
+                            'assets/rewards.png',
                             width: 250,
                           ),
                         ),
@@ -50,16 +49,15 @@ class GamificationScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Slanted Green Section
           ClipPath(
             clipper: TopSlantClipper(),
             child: Container(
               padding: const EdgeInsets.all(32.0),
-              color: const Color(0xFF7AB896), // Eco-friendly green color
+              color: const Color(0xFF7AB896),
               child: Column(
                 children: [
                   Text(
-                    'Automatically shares your real-time location with trusted contacts during critical times, ensuring they know where you are.',
+                    'Automatically shares your real-time location with trusted contacts during critical times.',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -69,23 +67,38 @@ class GamificationScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
-                  // Dot indicators
+                  // 3 Dot Indicators (1st active)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                      4,
+                      3,
                       (index) => Container(
                         margin: const EdgeInsets.symmetric(horizontal: 4),
                         width: 8,
                         height: 8,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: index == 1
-                              ? const Color(0xFFE5A0B0) // Pink color
-                              : Colors.white,
+                          color: index == 0 ? const Color(0xFFE5A0B0) : Colors.white,
                         ),
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Arrow Button to Onboarding2
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => GamificationScreen2()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      shape: CircleBorder(),
+                      padding: EdgeInsets.all(16),
+                    ),
+                    child: Icon(Icons.arrow_forward, size: 32),
                   ),
                 ],
               ),
@@ -97,15 +110,14 @@ class GamificationScreen extends StatelessWidget {
   }
 }
 
-// Custom Clipper for Slanted Top Edge
 class TopSlantClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     Path path = Path();
-    path.lineTo(size.width - 100, 0); // Slant from left to 100px from right
-    path.lineTo(size.width, 40); // Diagonal cut
-    path.lineTo(size.width, size.height); // Bottom-right
-    path.lineTo(0, size.height); // Bottom-left
+    path.lineTo(size.width - 100, 0);
+    path.lineTo(size.width, 40);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
     path.close();
     return path;
   }
