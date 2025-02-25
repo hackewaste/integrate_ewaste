@@ -70,7 +70,7 @@ class OrderSummaryPage extends StatelessWidget {
                 ),
                 ElevatedButton.icon(
                   onPressed: () {
-                    // Confirm request and proceed
+
                   },
                   icon: Icon(Icons.check_circle),
                   label: Text('Confirm Request'),

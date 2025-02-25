@@ -7,6 +7,7 @@ import 'package:ewaste/pages/VolunteerRequestPage.dart';
 import 'package:ewaste/pages/dropImage.dart';
 import 'package:ewaste/pages/login.dart';
 import 'package:ewaste/pages/register.dart';
+import 'package:ewaste/presentations/user/DisposalLocation/disposal_locations_page.dart';
 import 'package:ewaste/presentations/user/home/widgets/didyouknow.dart';
 //import 'package:ewaste/services/auth_gate.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,7 +32,7 @@ class Ewaste extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: OrderSummaryPage(),
+      home: DisposalLocationsPage(),
     );
   }
 }
