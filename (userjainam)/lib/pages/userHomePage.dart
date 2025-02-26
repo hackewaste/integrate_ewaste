@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'NotificationPage.dart';
-import 'UserAccountPage1.dart';
+import 'package:ewaste/pages/profilepages/UserAccountPage1.dart';
 import 'package:ewaste/pages/userHomePage.dart';
 import 'package:ewaste/pages/dropImage.dart';
 import 'package:ewaste/pages/info.dart';

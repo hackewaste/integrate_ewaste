@@ -37,7 +37,7 @@ class _UserCreditsPageState extends State<UserCreditsPage> {
         });
       }
     }
-  }
+  } 
 
   @override
   Widget build(BuildContext context) {
