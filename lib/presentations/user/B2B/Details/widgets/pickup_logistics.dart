@@ -1,28 +1,36 @@
+import 'package:ewaste/presentations/user/B2B/Details/widgets/ui_helpers.dart';
 import 'package:flutter/material.dart';
 
-class PickupLogisticsSection extends StatelessWidget {
+
+class PickupLogisticsSection extends StatefulWidget {
+  @override
+  _PickupLogisticsSectionState createState() => _PickupLogisticsSectionState();
+}
+
+class _PickupLogisticsSectionState extends State<PickupLogisticsSection> {
+  bool _requiresLoadingAssistance = false;
+  TextEditingController _pickupAddressController = TextEditingController();
+  TextEditingController dateTimeController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Card(
-        margin: EdgeInsets.all(16),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Text("Pickup & Logistics", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
-              TextField(decoration: InputDecoration(labelText: "Pickup Address")),
-              TextField(decoration: InputDecoration(labelText: "Pickup Date & Time")),
-              SwitchListTile(
-                title: Text("Loading Assistance Required?"),
-                value: false,
-                onChanged: (bool val) {},
-              ),
-            ],
-          ),
+    return buildCenteredCard(
+
+      context,
+      title: "Pickup & Logistics",
+      children: [
+        buildInputField(_pickupAddressController, "Pickup Address", Icons.location_on),
+        buildInputField(dateTimeController, "Pickup Date & Time", Icons.calendar_today),
+        buildSwitchField(
+          "Requires Loading Assistance",
+          _requiresLoadingAssistance,
+              (bool value) {
+            setState(() {
+              _requiresLoadingAssistance = value;
+            });
+          },
         ),
-      ),
+      ],
     );
   }
 }

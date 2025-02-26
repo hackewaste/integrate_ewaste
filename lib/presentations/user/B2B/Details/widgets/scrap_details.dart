@@ -1,30 +1,27 @@
 import 'package:flutter/material.dart';
+import '../widgets/ui_helpers.dart';
 
 class ScrapDetailsSection extends StatelessWidget {
+  final String scrapType = "Electronic";
+  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController quantityController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Card(
-        margin: EdgeInsets.all(16),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Text("Scrap Details", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
-              DropdownButtonFormField(
-                items: ["Metal", "Plastic", "Electronic"]
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (val) {},
-                decoration: InputDecoration(labelText: "Type of Scrap"),
-              ),
-              TextField(decoration: InputDecoration(labelText: "Scrap Description")),
-              TextField(decoration: InputDecoration(labelText: "Quantity (KG or Tonnes)")),
-            ],
-          ),
+    return buildCenteredCard(
+      context,
+      title: "Scrap Details",
+      children: [
+        buildDropdownField(
+          label: "Type of Scrap",
+          value: scrapType,
+          items: ["Metal", "Plastic", "Electronic"],
+          icon: Icons.recycling,
+          onChanged: (val) {},
         ),
-      ),
+        buildInputField(descriptionController, "Description", Icons.description),
+        buildInputField(quantityController, "Quantity (KG/Tonnes)", Icons.scale),
+      ],
     );
   }
 }

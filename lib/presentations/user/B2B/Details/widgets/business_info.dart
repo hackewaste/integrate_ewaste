@@ -1,30 +1,27 @@
 import 'package:flutter/material.dart';
+import '../widgets/ui_helpers.dart';
 
 class BusinessInfoSection extends StatelessWidget {
+  final TextEditingController companyNameController = TextEditingController();
+  final TextEditingController gstController = TextEditingController();
+  final String businessType = "Manufacturing";
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Card(
-        margin: EdgeInsets.all(16),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Text("Business Information", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
-              TextField(decoration: InputDecoration(labelText: "Company Name")),
-              TextField(decoration: InputDecoration(labelText: "GST Number (Optional)")),
-              DropdownButtonFormField(
-                items: ["Manufacturing", "IT", "Retail"]
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (val) {},
-                decoration: InputDecoration(labelText: "Business Type"),
-              ),
-            ],
-          ),
+    return buildCenteredCard(
+      context,
+      title: "Business Information",
+      children: [
+        buildInputField(companyNameController, "Company Name", Icons.business),
+        buildInputField(gstController, "GST Number (Optional)", Icons.confirmation_number),
+        buildDropdownField(
+          label: "Business Type",
+          value: businessType,
+          items: ["Manufacturing", "Retail", "Service"],
+          icon: Icons.category,
+          onChanged: (val) {},
         ),
-      ),
+      ],
     );
   }
 }
