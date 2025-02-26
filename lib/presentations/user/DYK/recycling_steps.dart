@@ -1,5 +1,5 @@
-import 'package:ewaste/presentations/user/DYKRecycling/widgets/step_card.dart';
-import 'package:ewaste/presentations/user/DYKRecycling/widgets/video_card.dart';
+import 'package:ewaste/presentations/user/DYK/widgets/step_card.dart';
+import 'package:ewaste/presentations/user/DYK/widgets/video_card.dart';
 import 'package:flutter/material.dart';
 import '../../../data/models/recycling_steps.dart';
 

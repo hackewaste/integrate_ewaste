@@ -7,7 +7,7 @@ import 'package:ewaste/services/auth_gate.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:ewaste/pages/userHomePage.dart';
+import 'package:ewaste/presentations/user/home/userHomePage.dart';
 import 'package:ewaste/pages/onboarding1.dart';
 import 'package:ewaste/pages/onboarding2.dart';
 import 'package:ewaste/pages/onboarding3.dart';

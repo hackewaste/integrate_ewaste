@@ -1,60 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ewaste/firebase_options.dart';
-import 'package:ewaste/pages/EarnPage.dart';
-import 'package:ewaste/pages/OrderSummaryPage.dart';
-import 'package:ewaste/pages/RequestConfirmationPage.dart';
-import 'package:ewaste/pages/RequestTrackingPage.dart';
+
+
+
+
 import 'package:ewaste/pages/UserHomePage.dart';
-import 'package:ewaste/pages/VolunteerHomePage.dart';
-import 'package:ewaste/pages/VolunteerRequestPage.dart';
-import 'package:ewaste/pages/dropImage.dart';
-import 'package:ewaste/pages/login.dart';
-import 'package:ewaste/pages/redeem.dart';
-import 'package:ewaste/pages/register.dart';
-import 'package:ewaste/presentations/user/B2B/Confirmation/b2b_req_confirmation.dart';
-import 'package:ewaste/presentations/user/B2B/Details/enter_details_page.dart';
-import 'package:ewaste/presentations/user/DisposalLocation/disposal_locations_page.dart';
-import 'package:ewaste/presentations/user/home/widgets/didyouknow.dart';
-//import 'package:ewaste/services/auth_gate.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ewaste/pages/struserhome.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'pages/landing.dart';  // Now the path is correct
-import 'pages/onboarding1.dart';
-import 'pages/onboarding2.dart';
-import 'pages/onboarding3.dart';
-import 'pages/modelwaiting.dart';
-// Future<void> main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
 
-//   // Manually configure Firebase options
-//   await Firebase.initializeApp(
-//     options: DefaultFirebaseOptions.currentPlatform,
-//   );
-
-//   runApp(const Ewaste());
-// }
-
-// class Ewaste extends StatelessWidget {
-//   const Ewaste({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       home: RegisterPage(),
-//     );
-//   }
-// }
- 
- 
-
-
-
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Ensure everything is loaded before runApp
+  await Firebase.initializeApp(); // Initialize Firebase
+  runApp(MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -63,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'EcoElectronic',
       debugShowCheckedModeBanner: false,
-      home: RewardsScreen(),
+      home: UserHomePage(),
       theme: ThemeData(
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,

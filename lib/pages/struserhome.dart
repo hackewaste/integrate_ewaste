@@ -1,12 +1,55 @@
+
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 
+import 'package:ewaste/presentations/user/home/userHomePage.dart';
+import 'package:ewaste/pages/dropImage.dart';
+import 'package:ewaste/pages/info.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
-class  UserHomePage extends StatelessWidget {
-  const UserHomePage({super.key});
+class UserHomepage extends StatefulWidget {
+  const UserHomepage({super.key});
 
+  @override
+  State<UserHomepage> createState() => _UserHomepageState();
+}
+
+class _UserHomepageState extends State<UserHomepage> {
+  int _currentIndex= 0;
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+
+    // Navigation logic for each tab
+    switch (index) {
+      case 0: // Home
+      // Stay on the current Home page
+        break;
+      case 1: // Explore
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const InfoPage()),
+        );
+        break;
+      case 2: // Saved
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => const BadgesWidget()), // Navigate to UserAccountPage
+        // );
+        break;
+      case 3: // Profile (Redirect to Home)
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => const UserAccountPage(title: 'User Profile',)), // Navigate to UserAccountPage
+        // );
+        break;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,9 +60,41 @@ class  UserHomePage extends StatelessWidget {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {},
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('notifications')
+                .where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                .where('read', isEqualTo: false) // Only fetch unread notifications
+                .snapshots(),
+            builder: (context, snapshot) {
+              int unreadCount = snapshot.data?.docs.length ?? 0;
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications),
+                    onPressed: () {
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(builder: (context) => NotificationPage()),
+                      // );
+                    },
+                  ),
+                  if (unreadCount > 0) // Only show if there are unread notifications
+                    Positioned(
+                      right: 10,
+                      top: 10,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.red,
+                        radius: 8,
+                        child: Text(
+                          unreadCount.toString(),
+                          style: TextStyle(fontSize: 12, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -30,7 +105,7 @@ class  UserHomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              HeaderSection(),
+              HeaderSection(context),
               const SizedBox(height: 24.0),
               UpcomingEventsSection(),
               const SizedBox(height: 24.0),
@@ -40,29 +115,42 @@ class  UserHomePage extends StatelessWidget {
               const SizedBox(height: 24.0),
               InviteSection(),
               const SizedBox(height: 24.0),
-              OverallStatisticsSection(),
-              const SizedBox(height: 24.0),
               buildDateSelector(),
               const SizedBox(height: 24.0),
-              buildDailyActivity()
+              buildDailyActivity(context), // Pass context here
             ],
           ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        selectedItemColor: Colors.deepPurple,
+        unselectedItemColor: Colors.grey,
+        onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.home), label: 'Home', backgroundColor: Colors.black),
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
-          BottomNavigationBarItem(icon: Icon(Icons.save), label: 'Saved'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.explore),
+            label: 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark),
+            label: 'Rewards',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
         ],
       ),
     );
   }
 }
 
-Widget HeaderSection() {
+Widget HeaderSection(BuildContext context) {
   return Container(
     padding: const EdgeInsets.all(16.0),
     decoration: BoxDecoration(
@@ -78,7 +166,12 @@ Widget HeaderSection() {
         ),
         const SizedBox(height: 8.0),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const DropImagePage()),
+            );
+          },
           child: const Text('Sell Now'),
         ),
       ],
@@ -163,7 +256,7 @@ Widget UpcomingEventsSection() {
 
 Widget StepsSection() {
   return Container(
-    padding: const EdgeInsets.all(16.0),
+    padding: const EdgeInsets.all(1.0),
     decoration: BoxDecoration(
       color: Colors.amber[50],
       borderRadius: BorderRadius.circular(12.0),
@@ -328,67 +421,6 @@ Widget B2BPostSection() {
   );
 }
 
-
-
-// Widget B2BPostSection() {
-//    return Card(
-//       margin: EdgeInsets.all(16),
-//       shape: RoundedRectangleBorder(
-//         borderRadius: BorderRadius.circular(16),
-//       ),
-//       elevation: 4,
-//       child: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Row(
-//           children: [
-//             // Text Section
-//             Expanded(
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Text(
-//                     "Bulk Scrap Request",
-//                     style: TextStyle(
-//                       fontSize: 20,
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//                   ),
-//                   SizedBox(height: 8),
-//                   Text(
-//                     "Industries",
-//                     style: TextStyle(
-//                       fontSize: 16,
-//                       color: Colors.grey[700],
-//                     ),
-//                   ),
-//                   SizedBox(height: 16),
-//                   ElevatedButton(
-//                     onPressed: onButtonPressed,
-//                     style: ElevatedButton.styleFrom(
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.circular(8),
-//                       ),
-//                       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-//                     ),
-//                     child: Text("Request Now"),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             // Sticker/Image Section
-//             CircleAvatar(
-//               radius: 40,
-//               backgroundColor: Colors.grey[200],
-//               backgroundImage: AssetImage('assets/sticker.png'), // Replace with your image path
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-// }
-
-
-
 Widget InviteSection() {
   return Container(
     padding: const EdgeInsets.all(16.0),
@@ -455,152 +487,174 @@ Widget OverallStatisticsSection() {
   );
 }
 
- BarChartGroupData _buildBarGroup(int x, double y, Color color) {
-    return BarChartGroupData(
-      x: x,
-      barRods: [
-        BarChartRodData(
-          fromY: 0,           // Starting point of the bar (can be 0 or any other value)
-          toY: y,             // Ending point of the bar (replace 'y' with the actual value, it should be a valid double)
-          color: color,       // The color of the bar
-          width: 20,          // The width of the bar
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(6)), // Styling the bar's top border
-        )
-      ],
-    );
-  }
+BarChartGroupData _buildBarGroup(int x, double y, Color color) {
+  return BarChartGroupData(
+    x: x,
+    barRods: [
+      BarChartRodData(
+        fromY: 0,           // Starting point of the bar (can be 0 or any other value)
+        toY: y,             // Ending point of the bar (replace 'y' with the actual value, it should be a valid double)
+        color: color,       // The color of the bar
+        width: 20,          // The width of the bar
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(6)), // Styling the bar's top border
+      )
+    ],
+  );
+}
 
 Widget buildDateSelector() {
-    final now = DateTime.now();
-    final dates = List.generate(7, (index) => now.add(Duration(days: index)));
+  final now = DateTime.now();
+  final dates = List.generate(7, (index) => now.add(Duration(days: index)));
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: dates.map((date) {
-        final isToday = date.day == now.day;
-        final textColor = isToday ? Colors.orange : const Color(0xFF324F5E);
-        final bgColor = isToday ? Colors.orange : Colors.transparent;
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: dates.map((date) {
+      final isToday = date.day == now.day;
+      final textColor = isToday ? Colors.orange : const Color(0xFF324F5E);
+      final bgColor = isToday ? Colors.orange : Colors.transparent;
 
-        return Column(
-          children: [
-            Text(
-              DateFormat('EEE').format(date),
-              style: TextStyle(color: textColor),
-            ),
-            const SizedBox(height: 4),
-            Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                color: bgColor,
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  '${date.day}',
-                  style: TextStyle(
-                    color: isToday ? Colors.white : textColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      }).toList(),
-    );
-  }
-
-Widget buildDailyActivity() {
-    return Row(
-      children: [
-        SizedBox(
-          width: 120,
-          height: 120,
-          child: Stack(
-            children: [
-              Center(
-                child: SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: CircularProgressIndicator(
-                    value: 0.75,
-                    strokeWidth: 10,
-                    backgroundColor: Colors.grey[300],
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
-                  ),
-                ),
-              ),
-              Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Text(
-                      '20',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF324F5E),
-                      ),
-                    ),
-                    Text(
-                      'June',
-                      style: TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 20),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Daily activity',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF324F5E),
-                ),
-              ),
-              const SizedBox(height: 10),
-              _buildActivityLegendItem('Walk', Colors.amber),
-              _buildActivityLegendItem('Rest', Colors.red),
-              _buildActivityLegendItem('Sit', Colors.green),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActivityLegendItem(String label, Color color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
+      return Column(
         children: [
+          Text(
+            DateFormat('EEE').format(date),
+            style: TextStyle(color: textColor),
+          ),
+          const SizedBox(height: 4),
           Container(
-            width: 16,
-            height: 16,
+            width: 30,
+            height: 30,
             decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(4),
+              color: bgColor,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                '${date.day}',
+                style: TextStyle(
+                  color: isToday ? Colors.white : textColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(color: Colors.grey),
+        ],
+      );
+    }).toList(),
+  );
+}
+
+Widget buildDailyActivity(BuildContext context) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          SizedBox(
+            width: 120,
+            height: 120,
+            child: Stack(
+              children: [
+                Center(
+                  child: SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: CircularProgressIndicator(
+                      value: 0.75,
+                      strokeWidth: 10,
+                      backgroundColor: Colors.grey[300],
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Text(
+                        '20',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF324F5E),
+                        ),
+                      ),
+                      Text(
+                        'June',
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Daily Progress',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF324F5E),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                _buildActivityLegendItem('Ewaste', Colors.green),
+              ],
+            ),
           ),
         ],
       ),
-    );
-  }
+      const SizedBox(height: 16),
+      Align(
+        alignment: Alignment.centerRight,
+        child: TextButton(
+           onPressed: () {
+          //   Navigator.push(
+          //     context,
+          //     MaterialPageRoute(builder: (context) => const HomePage()),
+          //   );
+          },
+          child: const Text(
+            'View More',
+            style: TextStyle(
+              color: Colors.blue,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildActivityLegendItem(String label, Color color) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4.0),
+    child: Row(
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.grey),
+        ),
+      ],
+    ),
+  );
+}
 class StepBox extends StatelessWidget {
   final String imagePath;
   final String label;
@@ -624,6 +678,32 @@ class StepBox extends StatelessWidget {
         const SizedBox(height: 8.0),
         Text(label, textAlign: TextAlign.center),
       ],
+    );
+  }
+}
+
+
+
+class ExplorePage extends StatelessWidget {
+  const ExplorePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Explore')),
+      body: const Center(child: Text('Explore Page Content')),
+    );
+  }
+}
+
+class SavedPage extends StatelessWidget {
+  const SavedPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Saved')),
+      body: const Center(child: Text('Saved Page Content')),
     );
   }
 }

@@ -1,5 +1,5 @@
 
-import 'package:ewaste/pages/userHomePage.dart';
+import 'package:ewaste/presentations/user/home/userHomePage.dart';
 import 'package:flutter/material.dart';
 
 import '../data/services/auth_service.dart';

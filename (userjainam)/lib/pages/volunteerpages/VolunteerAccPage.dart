@@ -3,7 +3,7 @@ import 'VolunteerAccountPage.dart';
 import 'package:ewaste/main.dart';
 import 'theme_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:ewaste/pages/userHomePage.dart';
+import 'package:ewaste/presentations/user/home/userHomePage.dart';
 
 void main() {
   runApp(const MyApp());

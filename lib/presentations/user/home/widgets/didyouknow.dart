@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../DYKRecycling/recycling_steps.dart';
+import '../../DYK/recycling_steps.dart';
+
 
 
 class RecyclingProcessCard extends StatelessWidget {

@@ -11,7 +11,7 @@ class AppbarVolunteer extends StatelessWidget implements PreferredSizeWidget{
         style: TextStyle(color: Colors.black),
       ),
       centerTitle: true,
-      backgroundColor: Colors.deepPurpleAccent,
+      backgroundColor: Colors.deepPurpleAccent[100],
       elevation: 0,
       iconTheme: const IconThemeData(color: Colors.black),
       actions: [

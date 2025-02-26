@@ -1,5 +1,5 @@
 import 'package:ewaste/pages/login.dart';
-import 'package:ewaste/pages/userHomePage.dart';
+import 'package:ewaste/presentations/user/home/userHomePage.dart';
 import 'package:ewaste/pages/volunteerHomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
