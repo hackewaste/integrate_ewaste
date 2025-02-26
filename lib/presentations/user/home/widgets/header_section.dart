@@ -1,6 +1,7 @@
+import 'package:ewaste/pages/dropImage.dart';
 import 'package:flutter/material.dart';
 
-Widget HeaderSection() {
+Widget HeaderSection(context) {
   return Container(
     padding: const EdgeInsets.all(16.0),
     decoration: BoxDecoration(
@@ -16,7 +17,13 @@ Widget HeaderSection() {
         ),
         const SizedBox(height: 8.0),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>  DropImagePage()),
+            );
+          },
           child: const Text('Sell'),
         ),
       ],

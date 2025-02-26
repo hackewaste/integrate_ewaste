@@ -1,13 +1,20 @@
+import 'dart:convert';
+import 'dart:io';
+//import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ewaste/pages/pickupfinal.dart';
+import 'package:image/image.dart' as img;
+//import 'package:carousel_slider/carousel_slider.dart' as cs;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io'; // For File handling
-import 'package:video_player/video_player.dart';
+import 'package:http/http.dart' as http;
+import 'credits.dart';
+import 'modelwaiting.dart';
 
 class DropImagePage extends StatefulWidget {
   const DropImagePage({super.key});
 
-  
+
   @override
   State<DropImagePage> createState() => _DropImagePageState();
 }
@@ -116,7 +123,7 @@ class _DropImagePageState extends State<DropImagePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const UploadWastePage()),
+                          builder: (context) =>  DetectionPage()),
                     );
                   },
                 ),
@@ -207,195 +214,267 @@ class ServiceIcon extends StatelessWidget {
 }
 
 // Upload Waste Page
-class UploadWastePage extends StatefulWidget {
-  const UploadWastePage({super.key});
-
+class DetectionPage extends StatefulWidget {
   @override
-  State<UploadWastePage> createState() => _UploadWastePageState();
+  _DetectionPageState createState() => _DetectionPageState();
 }
 
-class _UploadWastePageState extends State<UploadWastePage> {
-  File? _selectedFile; // Holds the selected file (image or video)
-  bool _isVideo = false;
-  VideoPlayerController? _videoController;
-  final ImagePicker _picker = ImagePicker(); // ImagePicker instance
+class _DetectionPageState extends State<DetectionPage> {
+  final List<File> _selectedImages = [];
+  final List<Map<String, dynamic>> _detectionResults = []; // Updated type
+  bool _isProcessing = false;
 
-  Future<void> _pickMedia(ImageSource source, bool isVideo) async {
-    final XFile? pickedFile = await (isVideo
-        ? _picker.pickVideo(source: source)
-        : _picker.pickImage(source: source));
+  // Pick multiple images from the gallery
+  Future<void> _pickImages() async {
+    final picker = ImagePicker();
+    final pickedFiles = await picker.pickMultiImage();
 
-    if (pickedFile != null) {
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
       setState(() {
-        _selectedFile = File(pickedFile.path);
-        _isVideo = isVideo;
-        if (_isVideo) {
-          _videoController?.dispose();
-          _videoController = VideoPlayerController.file(_selectedFile!)
-            ..initialize().then((_) {
-              setState(() {});
-              _videoController!.play();
-            });
-        }
+        _selectedImages.clear();
+        _selectedImages.addAll(pickedFiles.map((file) => File(file.path)));
       });
     }
   }
 
-  void _showMediaPickerOptions() {
-    showModalBottomSheet(
+  // Compress an image
+  Future<File> compressImage(File imageFile) async {
+    final bytes = await imageFile.readAsBytes();
+    final originalImage = img.decodeImage(bytes)!;
+    final compressedImage = img.encodeJpg(originalImage, quality: 85);
+    final compressedFile = File(imageFile.path)
+      ..writeAsBytesSync(compressedImage);
+    return compressedFile;
+  }
+
+  // Send the images to the backend
+  // Send the images to the backend
+Future<void> _sendImagesToBackend() async {
+  if (_selectedImages.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please select images first.')),
+    );
+    return;
+  }
+
+  try {
+    setState(() {
+      _isProcessing = true;
+      _detectionResults.clear();
+    });
+
+    // Show loading dialog
+    showDialog(
       context: context,
+      barrierDismissible: false, // Prevent dismissing the dialog
       builder: (BuildContext context) {
-        return Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('Choose Image from Gallery'),
-              onTap: () {
-                Navigator.pop(context);
-                _pickMedia(ImageSource.gallery, false);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('Capture Image'),
-              onTap: () {
-                Navigator.pop(context);
-                _pickMedia(ImageSource.camera, false);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.video_library),
-              title: const Text('Choose Video from Gallery'),
-              onTap: () {
-                Navigator.pop(context);
-                _pickMedia(ImageSource.gallery, true);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.videocam),
-              title: const Text('Capture Video'),
-              onTap: () {
-                Navigator.pop(context);
-                _pickMedia(ImageSource.camera, true);
-              },
-            ),
-          ],
+        return Dialog(
+          child: ProcessingScreen(),
         );
       },
     );
+
+    final url = Uri.parse('http://192.168.0.114:5000/predict');
+    final request = http.MultipartRequest('POST', url);
+
+    // Compress and attach images
+    for (var image in _selectedImages) {
+      final compressedImage = await compressImage(image);
+      request.files.add(
+        await http.MultipartFile.fromPath('images', compressedImage.path),
+      );
+    }
+
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseBody = await response.stream.bytesToString();
+      final jsonResponse = jsonDecode(responseBody);
+
+      // Map to track item counts
+      Map<String, int> detectedItems = {};
+
+      // Process detection results
+      final List<Map<String, dynamic>> processedResults = jsonResponse.map<Map<String, dynamic>>((result) {
+        final fileName = result['file_name'];
+        final detections = result['detections'] as List;
+
+        for (var detection in detections) {
+          String category = detection['class_name'];
+          detectedItems[category] = (detectedItems[category] ?? 0) + 1;
+        }
+
+        return {
+          'fileName': fileName,
+          'detections': detections,
+        };
+      }).toList();
+
+      // Calculate credits
+      // int totalCredits = calculateTotalCredits(detectedItems);
+      //
+      // // Add credits to detection results
+      // for (var result in processedResults) {
+      //   for (var detection in result['detections']) {
+      //     String category = detection['class_name'];
+      //     detection['credits'] = ewasteCredits[category] ?? 0; // Assign credits
+      //   }
+      // }
+
+      setState(() {
+        _detectionResults.addAll(processedResults);
+      });
+
+      // Show total credits earned
+
+    } else {
+      setState(() {
+        _detectionResults.add({'error': 'Error: ${response.reasonPhrase}'});
+      });
+    }
+  } catch (e) {
+    setState(() {
+      _detectionResults.add({'error': 'Error connecting to backend: $e'});
+    });
+  } finally {
+    Navigator.pop(context); // Close the loading dialog
+    setState(() {
+      _isProcessing = false; // Update processing state
+    });
+  }
+}
+
+
+  // Store detection results in Firebase and navigate to PickupRequestPage
+  Future<void> _requestPickup() async {
+  if (_detectionResults.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('No results to request pickup.')),
+    );
+    return;
   }
 
-  @override
-  void dispose() {
-    _videoController?.dispose();
-    super.dispose();
-  }
+  try {
+    final firestore = FirebaseFirestore.instance;
+    final requestId = firestore.collection('pickupRequests').doc().id; // Generate unique ID
 
+      await firestore.collection('pickupRequests').doc(requestId).set({
+      'status': 'pending',  // Can be used to track pickup request status
+      'created_at': FieldValue.serverTimestamp(),
+    });
+    // Convert detection results into required format for credit calculation
+    Map<String, int> detectedItems = {};
+
+    for (var result in _detectionResults) {
+      for (var detection in result['detections']) {
+        String category = detection['class_name'];
+
+        // Increment count for each detected category
+        if (detectedItems.containsKey(category)) {
+          detectedItems[category] = detectedItems[category]! + 1;
+        } else {
+          detectedItems[category] = 1;
+        }
+      }
+    }
+
+    // Calculate total credits
+    int totalCredits = calculateTotalCredits(detectedItems);
+
+    for (var result in _detectionResults) {
+      await firestore.collection('pickupRequests').doc(requestId).collection('results').add({
+        'fileName': result['fileName'],
+        'detections': result['detections'],
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    }
+
+    // Store total credits in Firestore
+      await firestore.collection('pickupRequests').doc(requestId).set({
+      'totalCredits': totalCredits,
+    }, SetOptions(merge: true));
+
+    // Navigate to PickupRequestPage with the request ID
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PickupRequestPage(requestId: requestId),
+      ),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to store results: $e')),
+    );
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text(
-          'Upload Waste',
-          style: TextStyle(color: Colors.black),
-        ),
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
+      appBar: AppBar(title: const Text('Object Detection')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            GestureDetector(
-              onTap: _showMediaPickerOptions,
-              child: DottedBorder(
-                color: Colors.grey,
-                strokeWidth: 1,
-                dashPattern: const [6, 3],
-                borderType: BorderType.RRect,
-                radius: const Radius.circular(8.0),
-                child: Container(
-                  height: 200, // Fixed height for the dotted border
-                  width: double.infinity,
-                  alignment: Alignment.center, // Ensures content is centered
-                  child: _selectedFile == null
-                      ? const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.cloud_upload,
-                                  size: 40, color: Colors.grey),
-                              SizedBox(height: 8),
-                              Text('Click to upload a picture or video'),
-                            ],
-                          ),
-                        )
-                      : _isVideo
-                          ? _videoController != null &&
-                                  _videoController!.value.isInitialized
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: FittedBox(
-                                    fit: BoxFit
-                                        .contain, // Ensures the video scales within bounds
-                                    child: SizedBox(
-                                      width: _videoController!.value.size.width,
-                                      height:
-                                          _videoController!.value.size.height,
-                                      child: VideoPlayer(_videoController!),
-                                    ),
-                                  ),
-                                )
-                              : const Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: FittedBox(
-                                fit: BoxFit
-                                    .contain, // Ensures the image fits within bounds
-                                child: Image.file(
-                                  _selectedFile!,
-                                ),
-                              ),
-                            ),
+            // if (_selectedImages.isNotEmpty)
+            //   CarouselSlider(
+            //     items: _selectedImages
+            //         .map((image) => Image.file(image, fit: BoxFit.cover))
+            //         .toList(),
+            //     options: CarouselOptions(
+            //       height: 200,
+            //       enlargeCenterPage: true,
+            //       enableInfiniteScroll: false,
+            //     ),
+            //   )
+            // else
+              Placeholder(fallbackHeight: 200),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _pickImages,
+              child: const Text('Select Images'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _isProcessing ? null : _sendImagesToBackend,
+              child: _isProcessing
+                  ? const CircularProgressIndicator()
+                  : const Text('Detect Objects'),
+            ),
+            const SizedBox(height: 16),
+            if (_detectionResults.isNotEmpty)
+  Expanded(
+    child: ListView.builder(
+      itemCount: _detectionResults.length,
+      itemBuilder: (context, index) {
+        final result = _detectionResults[index];
+        final detections = (result['detections'] as List).map((d) {
+          int credits = d['credits'] ?? 0;
+          return '${d['class_name']} (Confidence: ${(d['confidence'] * 100).toStringAsFixed(2)}%) - Credits: $credits';
+        }).join('\n');
+
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Image: ${result['fileName']}\n$detections',
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+        );
+      },
+    ),
+  ),
+            const SizedBox(height: 16),
+            if (_detectionResults.isNotEmpty)
+              ElevatedButton(
+                onPressed: _requestPickup, // Trigger request pickup logic
+                child: const Text('Request Pickup'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Enter your location...',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Type of e-waste (metal or plastic)',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Quantity',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                // Add functionality for sending the data
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                    vertical: 12.0, horizontal: 32.0),
-              ),
-              child: const Text('Send'),
-            ),
           ],
         ),
       ),

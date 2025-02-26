@@ -31,7 +31,7 @@ class  UserHomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              HeaderSection(),
+              HeaderSection(context),
               const SizedBox(height: 24.0),
               UpcomingEventsSection(),
               const SizedBox(height: 24.0),
