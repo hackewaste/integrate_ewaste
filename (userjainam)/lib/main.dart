@@ -13,6 +13,7 @@ import 'package:ewaste/pages/onboarding2.dart';
 import 'package:ewaste/pages/onboarding3.dart';
 import 'package:ewaste/pages/volunteerpages/theme_provider.dart';
 import 'package:provider/provider.dart'; // Ensure provider package is imported
+import 'package:ewaste/pages/redeem.dart';
 
 
 Future<void> main() async {
@@ -43,7 +44,9 @@ class UserEwaste extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasData) {
-            return GamificationScreen(); // If logged in, go to homepage
+            return GamificationScreen(); //If logged in, go to homepage
+            //return RewardsScreen();
+
           } else {
             return Login(); // Otherwise, go to login
           }
