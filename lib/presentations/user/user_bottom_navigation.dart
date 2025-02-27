@@ -11,7 +11,7 @@ class UserBottomNavigation extends StatelessWidget {
         BottomNavigationBarItem(
             icon: Icon(Icons.home), label: 'Home', backgroundColor: Colors.black),
         BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
-        BottomNavigationBarItem(icon: Icon(Icons.save), label: 'Saved'),
+        BottomNavigationBarItem(icon: Icon(Icons.save), label: 'Redeem'),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
       ],
     );

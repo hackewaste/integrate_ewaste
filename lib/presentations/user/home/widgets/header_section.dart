@@ -1,4 +1,5 @@
 import 'package:ewaste/pages/dropImage.dart';
+import 'package:ewaste/presentations/user/detection/widgets/detection_page.dart';
 import 'package:flutter/material.dart';
 
 Widget HeaderSection(context) {

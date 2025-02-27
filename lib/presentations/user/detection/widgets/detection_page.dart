@@ -51,19 +51,7 @@ class _DetectionPage1State extends State<DetectionPage1> {
               child: const Text('Select Images'),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {}, // Placeholder function for detection
-              child: const Text('Detect Objects'),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {}, // Placeholder function for request pickup
-              child: const Text('Request Pickup'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-            ),
+       
           ],
         ),
       ),

@@ -1,13 +1,39 @@
-import 'package:flutter/material.dart';
+class EWasteItem {
+  final String name;
+  final String category;
+  final int baseCredit;
+  int count;
 
-class EwasteItem {
-  final String itemName;
-  final int quantity;
-  final int creditPoints;
+  EWasteItem({
+    required this.name,
+    required this.category,
+    required this.baseCredit,
+    this.count = 0,
+  });
 
-  EwasteItem({required this.itemName, required this.quantity, required this.creditPoints});
+  factory EWasteItem.fromMap(Map<String, dynamic> map) {
+    return EWasteItem(
+      name: map['name'],
+      category: map['category'],
+      baseCredit: map['baseCredit'],
+      count: 0,
+    );
+  }
+  EWasteItem copyWith({int? count}) {
+    return EWasteItem(
+      name: name,
+      category: category,
+      baseCredit: baseCredit ?? this.baseCredit,
+      count: count ?? this.count,
+    );
+  }
 
-  static EwasteItem mockEwasteItem() {
-    return EwasteItem(itemName: "Old Laptop", quantity: 2, creditPoints: 50);
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'category': category,
+      'baseCredit': baseCredit,
+      'count': count,
+    };
   }
 }

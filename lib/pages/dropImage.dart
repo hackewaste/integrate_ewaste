@@ -249,164 +249,164 @@ class _DetectionPageState extends State<DetectionPage> {
 
   // Send the images to the backend
   // Send the images to the backend
-Future<void> _sendImagesToBackend() async {
-  if (_selectedImages.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Please select images first.')),
-    );
-    return;
-  }
-
-  try {
-    setState(() {
-      _isProcessing = true;
-      _detectionResults.clear();
-    });
-
-    // Show loading dialog
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Prevent dismissing the dialog
-      builder: (BuildContext context) {
-        return Dialog(
-          child: ProcessingScreen(),
-        );
-      },
-    );
-
-    final url = Uri.parse('http://192.168.0.114:5000/predict');
-    final request = http.MultipartRequest('POST', url);
-
-    // Compress and attach images
-    for (var image in _selectedImages) {
-      final compressedImage = await compressImage(image);
-      request.files.add(
-        await http.MultipartFile.fromPath('images', compressedImage.path),
+  Future<void> _sendImagesToBackend() async {
+    if (_selectedImages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select images first.')),
       );
+      return;
     }
 
-    final response = await request.send();
-
-    if (response.statusCode == 200) {
-      final responseBody = await response.stream.bytesToString();
-      final jsonResponse = jsonDecode(responseBody);
-
-      // Map to track item counts
-      Map<String, int> detectedItems = {};
-
-      // Process detection results
-      final List<Map<String, dynamic>> processedResults = jsonResponse.map<Map<String, dynamic>>((result) {
-        final fileName = result['file_name'];
-        final detections = result['detections'] as List;
-
-        for (var detection in detections) {
-          String category = detection['class_name'];
-          detectedItems[category] = (detectedItems[category] ?? 0) + 1;
-        }
-
-        return {
-          'fileName': fileName,
-          'detections': detections,
-        };
-      }).toList();
-
-      // Calculate credits
-      // int totalCredits = calculateTotalCredits(detectedItems);
-      //
-      // // Add credits to detection results
-      // for (var result in processedResults) {
-      //   for (var detection in result['detections']) {
-      //     String category = detection['class_name'];
-      //     detection['credits'] = ewasteCredits[category] ?? 0; // Assign credits
-      //   }
-      // }
-
+    try {
       setState(() {
-        _detectionResults.addAll(processedResults);
+        _isProcessing = true;
+        _detectionResults.clear();
       });
 
-      // Show total credits earned
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false, // Prevent dismissing the dialog
+        builder: (BuildContext context) {
+          return Dialog(
+            child: ProcessingScreen(),
+          );
+        },
+      );
 
-    } else {
+      final url = Uri.parse('http://192.168.56.1:5000/predict');
+      final request = http.MultipartRequest('POST', url);
+
+      // Compress and attach images
+      for (var image in _selectedImages) {
+        final compressedImage = await compressImage(image);
+        request.files.add(
+          await http.MultipartFile.fromPath('images', compressedImage.path),
+        );
+      }
+
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        final jsonResponse = jsonDecode(responseBody);
+
+        // Map to track item counts
+        Map<String, int> detectedItems = {};
+
+        // Process detection results
+        final List<Map<String, dynamic>> processedResults = jsonResponse.map<Map<String, dynamic>>((result) {
+          final fileName = result['file_name'];
+          final detections = result['detections'] as List;
+
+          for (var detection in detections) {
+            String category = detection['class_name'];
+            detectedItems[category] = (detectedItems[category] ?? 0) + 1;
+          }
+
+          return {
+            'fileName': fileName,
+            'detections': detections,
+          };
+        }).toList();
+
+        // Calculate credits
+        // int totalCredits = calculateTotalCredits(detectedItems);
+        //
+        // // Add credits to detection results
+        // for (var result in processedResults) {
+        //   for (var detection in result['detections']) {
+        //     String category = detection['class_name'];
+        //     detection['credits'] = ewasteCredits[category] ?? 0; // Assign credits
+        //   }
+        // }
+
+        setState(() {
+          _detectionResults.addAll(processedResults);
+        });
+
+        // Show total credits earned
+
+      } else {
+        setState(() {
+          _detectionResults.add({'error': 'Error: ${response.reasonPhrase}'});
+        });
+      }
+    } catch (e) {
       setState(() {
-        _detectionResults.add({'error': 'Error: ${response.reasonPhrase}'});
+        _detectionResults.add({'error': 'Error connecting to backend: $e'});
+      });
+    } finally {
+      Navigator.pop(context); // Close the loading dialog
+      setState(() {
+        _isProcessing = false; // Update processing state
       });
     }
-  } catch (e) {
-    setState(() {
-      _detectionResults.add({'error': 'Error connecting to backend: $e'});
-    });
-  } finally {
-    Navigator.pop(context); // Close the loading dialog
-    setState(() {
-      _isProcessing = false; // Update processing state
-    });
   }
-}
 
 
   // Store detection results in Firebase and navigate to PickupRequestPage
   Future<void> _requestPickup() async {
-  if (_detectionResults.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('No results to request pickup.')),
-    );
-    return;
-  }
+    if (_detectionResults.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No results to request pickup.')),
+      );
+      return;
+    }
 
-  try {
-    final firestore = FirebaseFirestore.instance;
-    final requestId = firestore.collection('pickupRequests').doc().id; // Generate unique ID
+    try {
+      final firestore = FirebaseFirestore.instance;
+      final requestId = firestore.collection('pickupRequests').doc().id; // Generate unique ID
 
       await firestore.collection('pickupRequests').doc(requestId).set({
-      'status': 'pending',  // Can be used to track pickup request status
-      'created_at': FieldValue.serverTimestamp(),
-    });
-    // Convert detection results into required format for credit calculation
-    Map<String, int> detectedItems = {};
+        'status': 'pending',  // Can be used to track pickup request status
+        'created_at': FieldValue.serverTimestamp(),
+      });
+      // Convert detection results into required format for credit calculation
+      Map<String, int> detectedItems = {};
 
-    for (var result in _detectionResults) {
-      for (var detection in result['detections']) {
-        String category = detection['class_name'];
+      for (var result in _detectionResults) {
+        for (var detection in result['detections']) {
+          String category = detection['class_name'];
 
-        // Increment count for each detected category
-        if (detectedItems.containsKey(category)) {
-          detectedItems[category] = detectedItems[category]! + 1;
-        } else {
-          detectedItems[category] = 1;
+          // Increment count for each detected category
+          if (detectedItems.containsKey(category)) {
+            detectedItems[category] = detectedItems[category]! + 1;
+          } else {
+            detectedItems[category] = 1;
+          }
         }
       }
-    }
 
-    // Calculate total credits
-    int totalCredits = calculateTotalCredits(detectedItems);
+      // Calculate total credits
+      int totalCredits = calculateTotalCredits(detectedItems);
 
-    for (var result in _detectionResults) {
-      await firestore.collection('pickupRequests').doc(requestId).collection('results').add({
-        'fileName': result['fileName'],
-        'detections': result['detections'],
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-    }
+      for (var result in _detectionResults) {
+        await firestore.collection('pickupRequests').doc(requestId).collection('results').add({
+          'fileName': result['fileName'],
+          'detections': result['detections'],
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+      }
 
-    // Store total credits in Firestore
+      // Store total credits in Firestore
       await firestore.collection('pickupRequests').doc(requestId).set({
-      'totalCredits': totalCredits,
-    }, SetOptions(merge: true));
+        'totalCredits': totalCredits,
+      }, SetOptions(merge: true));
 
-    // Navigate to PickupRequestPage with the request ID
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PickupRequestPage(requestId: requestId),
-      ),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to store results: $e')),
-    );
+      // Navigate to PickupRequestPage with the request ID
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PickupRequestPage(requestId: requestId),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to store results: $e')),
+      );
+    }
   }
-}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -427,7 +427,7 @@ Future<void> _sendImagesToBackend() async {
             //     ),
             //   )
             // else
-              Placeholder(fallbackHeight: 200),
+            Placeholder(fallbackHeight: 200),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _pickImages,
@@ -442,29 +442,29 @@ Future<void> _sendImagesToBackend() async {
             ),
             const SizedBox(height: 16),
             if (_detectionResults.isNotEmpty)
-  Expanded(
-    child: ListView.builder(
-      itemCount: _detectionResults.length,
-      itemBuilder: (context, index) {
-        final result = _detectionResults[index];
-        final detections = (result['detections'] as List).map((d) {
-          int credits = d['credits'] ?? 0;
-          return '${d['class_name']} (Confidence: ${(d['confidence'] * 100).toStringAsFixed(2)}%) - Credits: $credits';
-        }).join('\n');
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _detectionResults.length,
+                  itemBuilder: (context, index) {
+                    final result = _detectionResults[index];
+                    final detections = (result['detections'] as List).map((d) {
+                      int credits = d['credits'] ?? 0;
+                      return '${d['class_name']} (Confidence: ${(d['confidence'] * 100).toStringAsFixed(2)}%) - Credits: $credits';
+                    }).join('\n');
 
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Image: ${result['fileName']}\n$detections',
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        );
-      },
-    ),
-  ),
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'Image: ${result['fileName']}\n$detections',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
             const SizedBox(height: 16),
             if (_detectionResults.isNotEmpty)
               ElevatedButton(

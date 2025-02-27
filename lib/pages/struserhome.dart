@@ -169,7 +169,7 @@ Widget HeaderSection(BuildContext context) {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const DropImagePage()),
+              MaterialPageRoute(builder: (context) => DetectionPage()),
             );
           },
           child: const Text('Sell Now'),
