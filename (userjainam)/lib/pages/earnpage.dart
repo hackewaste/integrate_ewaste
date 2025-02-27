@@ -122,8 +122,8 @@ class _EarnPageState extends State<EarnPage> {
                       children: [
                         Expanded(
                           child: _buildStepCard(
-                            'Unlock 20 E-Waste Credits*',
-                            'when you recycle your e-waste',
+                            'Take a Quiz',
+                            '',
                           ),
                         ),
                         const SizedBox(width: 8),

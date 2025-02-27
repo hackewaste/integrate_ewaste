@@ -3,7 +3,7 @@ import 'VolunteerAccountPage.dart';
 import 'package:ewaste/main.dart';
 import 'theme_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:ewaste/presentations/user/home/userHomePage.dart';
+import 'package:ewaste/pages/userhomepage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -49,7 +49,7 @@ class _VolunteerAccPage extends State<VolunteerAccPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => UserHomepage(title: 'Volunteer Login')),
+              builder: (context) => UserHomepage()),
         );
         break;
       case 1: // Explore

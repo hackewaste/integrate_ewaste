@@ -1,4 +1,5 @@
-import 'package:ewaste/pages/UserHomePage.dart';
+
+import 'package:ewaste/pages/userhomepage.dart';
 import 'package:ewaste/pages/VolunteerHomePage.dart';
 import 'package:ewaste/pages/login.dart';
 import 'package:ewaste/pages/dropImage.dart';
@@ -22,7 +23,7 @@ class AuthGate extends StatelessWidget {
           if (userEmail.endsWith('@volunteer.com')) {
             return const VolunteerHomePage();
           } else {
-            return const UserHomepage(title: 'user homepage',);
+            return const UserHomepage();
           }
         }
 

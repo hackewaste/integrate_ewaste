@@ -10,40 +10,48 @@ class _RegisterPageState extends State<RegisterPage> {
   final _auth = AuthService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
+  
+  // NEW CODE START - Username Controller
+  final TextEditingController _usernameController = TextEditingController();
+  // NEW CODE END
+  
   String _role = "User"; // Default role
-  bool _isLoading = false; // Add this at the top of the State
+  bool _isLoading = false; // Loading state for button
 
-void _register() async {
-  if (_isLoading) return; // Prevents duplicate clicks
-  setState(() {
-    _isLoading = true; // Disable button
-  });
-
-  try {
-    String email = _emailController.text.trim();
-    String password = _pwController.text.trim();
-
-    // Call the sign-up function
-    await _auth.signUpWithEmailPassword(email, password, _role);
-
-    // Notify user of success
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Registered as $_role!")),
-    );
-
-    // Navigate to login page
-    Navigator.pop(context);
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Registration Failed: ${e.toString()}")),
-    );
-  } finally {
+  void _register() async {
+    if (_isLoading) return; // Prevent duplicate clicks
     setState(() {
-      _isLoading = false; // Re-enable button
+      _isLoading = true; // Disable button during registration
     });
-  }
-}
 
+    try {
+      String email = _emailController.text.trim();
+      String password = _pwController.text.trim();
+      
+      // NEW CODE START - Capture Username
+      String username = _usernameController.text.trim();
+      // NEW CODE END
+
+      // Updated to include username in sign-up
+      await _auth.signUpWithEmailPassword(email, password, _role, username);
+
+      // Success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Registered as $_role!")),
+      );
+
+      // Navigate to the login page
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Registration Failed: ${e.toString()}")),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false; // Re-enable button
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +73,18 @@ void _register() async {
               style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             ),
             SizedBox(height: 30),
+
+            // NEW CODE START - Username Input Field
+            TextField(
+              controller: _usernameController,
+              decoration: InputDecoration(
+                labelText: "Enter your username",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            // NEW CODE END
+
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
@@ -115,15 +135,13 @@ void _register() async {
                   child: Container(
                     padding: EdgeInsets.all(15),
                     decoration: BoxDecoration(
-                      color:
-                          _role == "Volunteer" ? Colors.blue : Colors.grey[200],
+                      color: _role == "Volunteer" ? Colors.blue : Colors.grey[200],
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       "Sign up as Volunteer",
                       style: TextStyle(
-                        color:
-                            _role == "Volunteer" ? Colors.white : Colors.black,
+                        color: _role == "Volunteer" ? Colors.white : Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -133,15 +151,15 @@ void _register() async {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-  onPressed: _isLoading ? null : _register, // Disable during loading
-  style: ElevatedButton.styleFrom(
-    backgroundColor: Colors.black,
-    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-  ),
-  child: _isLoading
-      ? CircularProgressIndicator(color: Colors.white)
-      : Text("Sign Up", style: TextStyle(fontSize: 16)),
-),
+              onPressed: _isLoading ? null : _register, // Disable when loading
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+              ),
+              child: _isLoading
+                  ? CircularProgressIndicator(color: Colors.white)
+                  : Text("Sign Up", style: TextStyle(fontSize: 16)),
+            ),
           ],
         ),
       ),

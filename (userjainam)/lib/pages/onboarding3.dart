@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ewaste/pages/UserHomePage.dart';
+import 'package:ewaste/pages/userHomePage.dart';
 
 class GamificationScreen3 extends StatelessWidget {
   @override
@@ -91,7 +91,7 @@ class GamificationScreen3 extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => UserHomepage(title: 'user profile',)),
+                        MaterialPageRoute(builder: (context) => UserHomepage()),
                       );
                     },
                     style: ElevatedButton.styleFrom(

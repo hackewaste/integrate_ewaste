@@ -46,7 +46,7 @@ class AuthService {
 }
 
   //sign up
-  Future<UserCredential> signUpWithEmailPassword(String email, String password, String role) async {
+  Future<UserCredential> signUpWithEmailPassword(String email, String password, String role,String username) async {
   try {
     // Check if user already exists to avoid duplicate sign-ups
     final existingUser = await _firestore.collection("Users")
@@ -67,6 +67,7 @@ class AuthService {
       'uid': userCredential.user!.uid,
       'email': email,
       'role': role,
+      'username': username,
     });
 
     print("User registered successfully.");

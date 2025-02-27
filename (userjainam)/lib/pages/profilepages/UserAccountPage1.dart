@@ -1,7 +1,6 @@
-import 'package:ewaste/pages/profilepages/UserAccPage2.dart';
+
 import 'package:flutter/material.dart';
 import 'package:ewaste/pages/profilepages/UserAccPage2.dart';
-import 'package:ewaste/main.dart';
 import 'package:ewaste/pages/volunteerpages/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:ewaste/pages/userHomePage.dart';
@@ -55,7 +54,7 @@ class _UserAccountPage extends State<UserAccountPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => UserHomepage(title: 'User Login')),
+              builder: (context) => UserHomepage()),
         );
         break;
       case 1: // Explore
