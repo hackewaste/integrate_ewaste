@@ -1,8 +1,10 @@
-import 'package:ewaste/user/dropimage/services/image_service.dart';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
+
+import 'image_service.dart';
 
 class ApiService {
   Future<List<Map<String, dynamic>>> sendImagesToBackend(

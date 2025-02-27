@@ -1,6 +1,7 @@
-import 'package:ewaste/user/dropimage/detection_page.dart';
-import 'package:ewaste/user/dropimage/widgets/service_icon.dart';
+
 import 'package:flutter/material.dart';
+
+import '../../../pages/dropImage.dart';
 
 class DropImagePage extends StatefulWidget {
   const DropImagePage({super.key});

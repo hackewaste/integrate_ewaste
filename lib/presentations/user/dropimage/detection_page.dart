@@ -1,5 +1,6 @@
 import 'package:ewaste/pages/credits.dart';
 import 'package:ewaste/pages/pickupfinal.dart';
+import 'package:ewaste/presentations/user/dropimage/services/pickupservice.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -7,7 +8,6 @@ import 'services/api_service.dart';
 import 'services/image_service.dart';
 import 'widgets/processing_screen.dart';
 import 'package:ewaste/pages/pickupfinal.dart'; // Ensure this is imported correctly
-import 'package:ewaste/user/dropimage/services/pickupservice.dart';
 
 class DetectionPage extends StatefulWidget {
   @override
@@ -69,7 +69,6 @@ class _DetectionPageState extends State<DetectionPage> {
     });
   }
 final PickupService _pickupService = PickupService();
-  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
