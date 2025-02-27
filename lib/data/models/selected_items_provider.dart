@@ -53,4 +53,14 @@ class SelectedItemsProvider extends ChangeNotifier {
     });
     return total;
   }
+
+  int getTotalItems() {
+    int total = 0;
+    selectedItems.forEach((_, items) {
+      for (var item in items) {
+        total += item.count;
+      }
+    });
+    return total;
+  }
 }

@@ -1,4 +1,4 @@
-import 'package:ewaste/presentations/user/detection/widgets/billing_summary.dart';
+import 'package:ewaste/presentations/user/detection/billing_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'widgets/manual_entry_card.dart';
