@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'EcoElectronic',
       debugShowCheckedModeBanner: false,
-      home: UserHomePage(),
+      home: DetectionPageF(),
       theme: ThemeData(
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
