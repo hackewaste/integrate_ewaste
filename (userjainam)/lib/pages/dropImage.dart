@@ -1,22 +1,20 @@
-import 'package:flutter/material.dart';
-import 'package:dotted_border/dotted_border.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io'; // For File handling
-import 'package:video_player/video_player.dart';
-import 'package:http/http.dart' as http;
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:image/image.dart' as img;
 import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
+//import 'package:carousel_slider/carousel_slider.dart';
 import 'package:ewaste/pages/pickupfinal.dart';
+import 'package:image/image.dart' as img;
+//import 'package:carousel_slider/carousel_slider.dart' as cs;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 import 'credits.dart';
-import 'package:ewaste/pages/modelwaiting.dart';
-
+import 'modelwaiting.dart';
 
 class DropImagePage extends StatefulWidget {
   const DropImagePage({super.key});
 
-  
+
   @override
   State<DropImagePage> createState() => _DropImagePageState();
 }
@@ -118,7 +116,7 @@ class _DropImagePageState extends State<DropImagePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ServiceIcon( 
+                ServiceIcon(
                   icon: Icons.local_shipping,
                   label: 'Pick waste',
                   onPressed: () {
@@ -313,24 +311,22 @@ Future<void> _sendImagesToBackend() async {
       }).toList();
 
       // Calculate credits
-      int totalCredits = calculateTotalCredits(detectedItems);
-
-      // Add credits to detection results
-      for (var result in processedResults) {
-        for (var detection in result['detections']) {
-          String category = detection['class_name'];
-          detection['credits'] = ewasteCredits[category] ?? 0; // Assign credits
-        }
-      }
+      // int totalCredits = calculateTotalCredits(detectedItems);
+      //
+      // // Add credits to detection results
+      // for (var result in processedResults) {
+      //   for (var detection in result['detections']) {
+      //     String category = detection['class_name'];
+      //     detection['credits'] = ewasteCredits[category] ?? 0; // Assign credits
+      //   }
+      // }
 
       setState(() {
         _detectionResults.addAll(processedResults);
       });
 
       // Show total credits earned
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('You earned $totalCredits credits!')),
-      );
+
     } else {
       setState(() {
         _detectionResults.add({'error': 'Error: ${response.reasonPhrase}'});
@@ -419,18 +415,18 @@ Future<void> _sendImagesToBackend() async {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            if (_selectedImages.isNotEmpty)
-              CarouselSlider(
-                items: _selectedImages
-                    .map((image) => Image.file(image, fit: BoxFit.cover))
-                    .toList(),
-                options: CarouselOptions(
-                  height: 200,
-                  enlargeCenterPage: true,
-                  enableInfiniteScroll: false,
-                ),
-              )
-            else
+            // if (_selectedImages.isNotEmpty)
+            //   CarouselSlider(
+            //     items: _selectedImages
+            //         .map((image) => Image.file(image, fit: BoxFit.cover))
+            //         .toList(),
+            //     options: CarouselOptions(
+            //       height: 200,
+            //       enlargeCenterPage: true,
+            //       enableInfiniteScroll: false,
+            //     ),
+            //   )
+            // else
               Placeholder(fallbackHeight: 200),
             const SizedBox(height: 16),
             ElevatedButton(
