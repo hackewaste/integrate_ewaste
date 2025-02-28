@@ -4,6 +4,7 @@ class RequestModel {
   final String requestId;
   final String userId;
   final String? assignedVolunteerId;
+  final String? assignedVolunteerName;
   final List<EWasteItem> eWasteItems;
   final int totalCredits;
   final String status;
@@ -14,6 +15,7 @@ class RequestModel {
     required this.requestId,
     required this.userId,
     this.assignedVolunteerId,
+    this.assignedVolunteerName,
     required this.eWasteItems,
     required this.totalCredits,
     required this.status,
@@ -26,6 +28,7 @@ class RequestModel {
       requestId: requestId,
       userId: data['userId'],
       assignedVolunteerId: data['assignedVolunteerId'],
+      assignedVolunteerName: data['assignedVolunteerName'],
       eWasteItems: (data['eWasteItems'] as List)
           .map((item) => EWasteItem.fromMap(item))
           .toList(),

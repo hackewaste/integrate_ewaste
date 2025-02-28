@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-
 import '../../../../data/models/request_model.dart';
 
 class SummaryCard extends StatefulWidget {
   final RequestModel request;
+  final String? volunteerName; // New field
 
-  const SummaryCard({Key? key, required this.request}) : super(key: key);
+  const SummaryCard({Key? key, required this.request, this.volunteerName}) : super(key: key);
 
   @override
   _SummaryCardState createState() => _SummaryCardState();
@@ -79,9 +79,18 @@ class _SummaryCardState extends State<SummaryCard> {
 
             const SizedBox(height: 10),
 
+            // Total Credits
             _buildDetailRow("💰 Total Credits", "${widget.request.totalCredits} points"),
+            const SizedBox(height: 10),
+
+            // Show Volunteer Name if Assigned
+            if (widget.volunteerName != null &&
+                (widget.request.status == "assigned" || widget.request.status == "picked"))
+              _buildDetailRow("👤 Volunteer", widget.volunteerName!),
+
             const SizedBox(height: 20),
 
+            // Processing Shimmer
             Center(
               child: Shimmer.fromColors(
                 baseColor: Colors.white.withOpacity(0.6),

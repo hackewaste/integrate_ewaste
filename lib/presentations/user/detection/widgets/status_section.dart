@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class StatusSection extends StatelessWidget {
   final String status;
+  final String? volunteerName; // New Field
 
-  const StatusSection({Key? key, required this.status}) : super(key: key);
+  const StatusSection({Key? key, required this.status, this.volunteerName}) : super(key: key);
 
   Color _getStatusColor() {
     switch (status) {
@@ -98,6 +99,22 @@ class StatusSection extends StatelessWidget {
                     color: Colors.white.withOpacity(0.9),
                   ),
                 ),
+                if (volunteerName != null && (status == "assigned" || status == "picked")) ...[
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Icon(Icons.person, size: 16, color: Colors.white.withOpacity(0.9)),
+                      const SizedBox(width: 5),
+                      Text(
+                        "Volunteer: $volunteerName",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ],
