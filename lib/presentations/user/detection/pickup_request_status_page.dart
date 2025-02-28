@@ -30,7 +30,7 @@ class _PickupRequestStatusPageState extends State<PickupRequestStatusPage> {
   Future<void> fetchRequestDetails() async {
     print("🔍 Fetching request details for ID: ${widget.requestId}");
 
-    RequestModel? request = await RequestService().getRequestDetails(widget.requestId);
+    RequestModel? request = await RequestFetchService().getRequestDetails(widget.requestId);
 
     setState(() {
       requestModel = request;

@@ -18,7 +18,7 @@ class _VolunteerRequestPageState extends State<VolunteerRequestPage> {
 
   // Mock Data
   final User user = User.mockUser();
-  final EwasteItem ewasteItem = EwasteItem.mockEwasteItem();
+  final EwasteItem ewasteItem = EWasteItem.mockEwasteItem();
   final LocationData userLocation = LocationData.mockLocation();
 
   @override

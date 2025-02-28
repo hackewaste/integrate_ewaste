@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../models/request_model.dart';
 
-class RequestService {
+class RequestFetchService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  /// Fetch request details including volunteer name & status
   Future<RequestModel?> getRequestDetails(String requestId) async {
     try {
       DocumentSnapshot<Map<String, dynamic>> doc =
@@ -18,7 +18,7 @@ class RequestService {
         if (volunteerId != null) {
           // Fetch Volunteer Name
           DocumentSnapshot<Map<String, dynamic>> volunteerDoc =
-          await _firestore.collection('volunteers').doc(volunteerId).get();
+          await _firestore.collection('Volunteers').doc(volunteerId).get();
           if (volunteerDoc.exists && volunteerDoc.data() != null) {
             volunteerName = volunteerDoc.data()!['name'];
           }
