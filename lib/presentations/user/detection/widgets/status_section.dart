@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StatusSection extends StatelessWidget {
-  final String status;
-  final String? volunteerName; // New Field
+  final String requestId; // Fetch data using requestId
 
-  const StatusSection({Key? key, required this.status, this.volunteerName}) : super(key: key);
+  const StatusSection({Key? key, required this.requestId}) : super(key: key);
 
-  Color _getStatusColor() {
+  Color _getStatusColor(String status) {
     switch (status) {
       case "pending":
         return Colors.orange;
@@ -21,7 +21,7 @@ class StatusSection extends StatelessWidget {
     }
   }
 
-  IconData _getStatusIcon() {
+  IconData _getStatusIcon(String status) {
     switch (status) {
       case "pending":
         return Icons.pending_actions;
@@ -36,7 +36,7 @@ class StatusSection extends StatelessWidget {
     }
   }
 
-  String _getStatusText() {
+  String _getStatusText(String status) {
     switch (status) {
       case "pending":
         return "Waiting for Assignment";
@@ -53,73 +53,100 @@ class StatusSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      shadowColor: Colors.black26,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [_getStatusColor().withOpacity(0.6), _getStatusColor()],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            AnimatedContainer(
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.2),
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance.collection('requests').doc(requestId).snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data == null || !snapshot.data!.exists) {
+          return const Center(
+            child: Text("Request not found", style: TextStyle(color: Colors.white)),
+          );
+        }
+
+        var requestData = snapshot.data!.data() as Map<String, dynamic>?;
+
+        if (requestData == null) {
+          return const Center(
+            child: Text("Invalid request data", style: TextStyle(color: Colors.white)),
+          );
+        }
+
+        // Safely extract status and volunteerName
+        String status = requestData['status']?.toString() ?? "pending";
+        String? volunteerName = requestData['assignedVolunteerName']?.toString();
+
+        return Card(
+          elevation: 6,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shadowColor: Colors.black26,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [_getStatusColor(status).withOpacity(0.6), _getStatusColor(status)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              child: Icon(_getStatusIcon(), color: Colors.white, size: 30),
+              borderRadius: BorderRadius.circular(20),
             ),
-            const SizedBox(width: 15),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.all(20),
+            child: Row(
               children: [
-                Text(
-                  "Status: ${status.toUpperCase()}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.white,
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.2),
                   ),
+                  child: Icon(_getStatusIcon(status), color: Colors.white, size: 30),
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  _getStatusText(),
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
-                if (volunteerName != null && (status == "assigned" || status == "picked")) ...[
-                  const SizedBox(height: 5),
-                  Row(
-                    children: [
-                      Icon(Icons.person, size: 16, color: Colors.white.withOpacity(0.9)),
-                      const SizedBox(width: 5),
-                      Text(
-                        "Volunteer: $volunteerName",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white.withOpacity(0.9),
-                        ),
+                const SizedBox(width: 15),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Status: ${status.toUpperCase()}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      _getStatusText(status),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                    if (volunteerName != null && (status == "assigned" || status == "picked")) ...[
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          Icon(Icons.person, size: 16, color: Colors.white.withOpacity(0.9)),
+                          const SizedBox(width: 5),
+                          Text(
+                            "Volunteer: $volunteerName",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
-                  ),
-                ],
+                  ],
+                ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

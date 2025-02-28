@@ -93,12 +93,13 @@ class _PickupRequestStatusPageState extends State<PickupRequestStatusPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           /// 🏷️ **Status Card**
-          StatusSection(status: requestModel!.status),
+          StatusSection(requestId: widget.requestId),
 
           const SizedBox(height: 20),
 
           /// 📦 **Order Summary Card**
-          SummaryCard(request: requestModel!),
+          SummaryCard(requestId: widget.requestId)  // Pass requestId here
+
         ],
       ),
     );

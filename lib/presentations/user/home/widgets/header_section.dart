@@ -1,4 +1,5 @@
 import 'package:ewaste/pages/dropImage.dart';
+import 'package:ewaste/presentations/user/detection/detection_page.dart';
 import 'package:ewaste/presentations/user/detection/widgets/detection_page.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +23,7 @@ Widget HeaderSection(context) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>  DropImagePage()),
+                  builder: (context) =>  DetectionPageF()),
             );
           },
           child: const Text('Sell'),
