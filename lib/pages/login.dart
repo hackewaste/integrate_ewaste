@@ -1,26 +1,38 @@
-import 'package:ewaste/pages/register.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../data/services/auth_service.dart';
+import '../presentations/user/home/userHomePage.dart';
+import '../pages/volunteerHomePage.dart';
+import '../presentations/volunteer/home/VolunteerHome.dart';
+import 'register.dart';
 
 class Login extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
 
   void login(BuildContext context) async {
-    //auth
     final authService = AuthService();
 
-    //try login
     try {
-      await authService.signInWithEmailPassword(
-          _emailController.text, _pwController.text);
-    } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(e.toString()),
-        ),
+      UserCredential user = await authService.signInWithEmailPassword(
+        _emailController.text.trim(),
+        _pwController.text.trim(),
       );
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection("Users").doc(user.user!.uid).get();
+      DocumentSnapshot volunteerDoc = await FirebaseFirestore.instance.collection("Volunteers").doc(user.user!.uid).get();
+
+      if (userDoc.exists) {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => UserHomePage()));
+      } else if (volunteerDoc.exists) {
+
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VolunteerHomePage1()));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("User role not found!")));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Login Failed: ${e.toString()}")));
     }
   }
 
@@ -31,94 +43,28 @@ class Login extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Hello User",
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              "Welcome Back",
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              "We are here to help you through waste recycling",
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            ),
-            SizedBox(height: 30),
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black26),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                children: [
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: "Enter your mail",
-                      border: OutlineInputBorder(),
-                    ),
-                    controller: _emailController,
-                  ),
-                  SizedBox(height: 20),
-                  TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: "Enter your password",
-                      border: OutlineInputBorder(),
-                    ),
-                    controller: _pwController,
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () => login(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                      shape: BeveledRectangleBorder(),
-                    ),
-                    child: Text(
-                      "Sign In",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(labelText: "Enter your email", border: OutlineInputBorder()),
             ),
             SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Don't have an account ? ",
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => RegisterPage()),
-                    );
-                  },
-                  child: Text(
-                    "Sign up",
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
+            TextField(
+              controller: _pwController,
+              obscureText: true,
+              decoration: InputDecoration(labelText: "Enter your password", border: OutlineInputBorder()),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => login(context),
+              child: Text("Sign In"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPage()));
+              },
+              child: Text("Don't have an account? Sign Up"),
             ),
           ],
         ),

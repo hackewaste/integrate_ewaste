@@ -1,8 +1,11 @@
-
-import 'package:ewaste/presentations/user/home/userHomePage.dart';
 import 'package:flutter/material.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../data/services/auth_service.dart';
+import '../presentations/user/home/userHomePage.dart';
+import '../pages/volunteerHomePage.dart';
+import '../presentations/volunteer/home/VolunteerHome.dart';
+import 'login.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -10,28 +13,34 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final _auth = AuthService();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _pwController = TextEditingController();
-  String _role = "User"; // Default role
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  String _selectedRole = 'User'; // Default role
 
-  void _register() async {
+  final AuthService _authService = AuthService();
+
+  void registerUser() async {
     try {
-      String email = _emailController.text.trim();
-      String password = _pwController.text.trim();
-
-      // Firebase Authentication
-      _auth.signUpWithEmailPassword(email, password, _role);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Registered as $_role!")),
+      UserCredential userCredential = await _authService.signUpWithEmailPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        name: _nameController.text.trim(),
+        phone: _phoneController.text.trim(),
+        address: _addressController.text.trim(),
+        role: _selectedRole,
       );
 
-      // Navigate to login page
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => UserHomePage()),
-      );
+      // Redirect based on role
+      if (_selectedRole == 'User') {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => UserHomePage()));
+      } else {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => VolunteerHomePage1()));
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Registration Failed: ${e.toString()}")),
@@ -43,102 +52,60 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      appBar: AppBar(title: Text("Register")),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Create an Account",
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text(
-              "Join us in recycling waste responsibly!",
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            ),
-            SizedBox(height: 30),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: "Enter your email (with domain)",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _pwController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: "Enter your password",
-                border: OutlineInputBorder(),
-              ),
+            _buildTextField(_nameController, "Full Name"),
+            SizedBox(height: 12),
+            _buildTextField(_emailController, "Email"),
+            SizedBox(height: 12),
+            _buildTextField(_phoneController, "Phone"),
+            SizedBox(height: 12),
+            _buildTextField(_addressController, "Address"),
+            SizedBox(height: 12),
+            _buildTextField(_passwordController, "Password", obscureText: true),
+            SizedBox(height: 12),
+
+            // Role selection
+            DropdownButtonFormField<String>(
+              value: _selectedRole,
+              items: ["User", "Volunteer"].map((role) {
+                return DropdownMenuItem(value: role, child: Text(role));
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedRole = value!;
+                });
+              },
+              decoration: InputDecoration(border: OutlineInputBorder(), labelText: "Select Role"),
             ),
             SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _role = "User";
-                    });
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color: _role == "User" ? Colors.blue : Colors.grey[200],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      "Sign up as User",
-                      style: TextStyle(
-                        color: _role == "User" ? Colors.white : Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _role = "Volunteer";
-                    });
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color:
-                          _role == "Volunteer" ? Colors.blue : Colors.grey[200],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      "Sign up as Volunteer",
-                      style: TextStyle(
-                        color:
-                            _role == "Volunteer" ? Colors.white : Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
+
             ElevatedButton(
-              onPressed: _register,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-              ),
-              child: Text(
-                "Sign Up",
-                style: TextStyle(fontSize: 16),
-              ),
+              onPressed: registerUser,
+              child: Text("Sign Up"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+              },
+              child: Text("Already have an account? Sign In"),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label, {bool obscureText = false}) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(),
       ),
     );
   }

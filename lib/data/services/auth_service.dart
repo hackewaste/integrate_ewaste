@@ -2,28 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
-  //instance of auth
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  //curretn user
+  // Get current user
   User? currentUser() {
     return _auth.currentUser;
   }
 
-  //sign in
-  Future<UserCredential> signInWithEmailPassword(String email, password) async {
+  // Sign in
+  Future<UserCredential> signInWithEmailPassword(String email, String password) async {
     try {
-      //sign user in
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-
-      //save user info it doesnt already exist
-      await _firestore.collection("Users").doc(userCredential.user!.uid).set(
-        {
-          'uid': userCredential.user!.uid,
-          'email': email,
-        },
+        email: email,
+        password: password
       );
 
       return userCredential;
@@ -32,37 +24,50 @@ class AuthService {
     }
   }
 
-  //sign up
-  // ...existing code...
-
-  //sign up
-  Future<UserCredential> signUpWithEmailPassword(
-      String email, password, role) async {
+  // Sign up with role-based data storage
+  Future<UserCredential> signUpWithEmailPassword({
+    required String email,
+    required String password,
+    required String name,
+    required String phone,
+    required String address,
+    required String role,
+  }) async {
     try {
-      //create user
-      UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password
+      );
 
-      //save user info in the appropriate collection
-      if (role == 'user') {
-        await _firestore.collection("Users").doc(userCredential.user!.uid).set(
-          {
-            'uid': userCredential.user!.uid,
-            'email': email,
-            'role': role,
-          },
-        );
-      } else {
-        await _firestore
-            .collection("Volunteers")
-            .doc(userCredential.user!.uid)
-            .set(
-          {
-            'uid': userCredential.user!.uid,
-            'email': email,
-            'role': role,
-          },
-        );
+      String uid = userCredential.user!.uid;
+      Map<String, dynamic> userData = {
+        'uid': uid,
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'role': role,
+        'createdAt': Timestamp.now(),
+      };
+
+      if (role == 'User') {
+        userData.addAll({
+          'address': address,
+          'credits': 0,
+          'totalRequests': 0,
+          'completedRequests': 0,
+          'pendingRequests': [],
+        });
+        await _firestore.collection("Users").doc(uid).set(userData);
+      } else if (role == 'Volunteer') {
+        userData.addAll({
+          'totalDeliveries': 0,
+          'completedDeliveries': 0,
+          'pendingDeliveries': [],
+          'currentRequestId': null,
+          'status': 'off-duty',
+          'location': {'latitude': 0.0, 'longitude': 0.0},
+        });
+        await _firestore.collection("Volunteers").doc(uid).set(userData);
       }
 
       return userCredential;
@@ -71,29 +76,8 @@ class AuthService {
     }
   }
 
-  // ...existing code... Future<UserCredential> signUpWithEmailPassword(String email, password, role) async {
-
-//     try {
-//       //create user
-//       UserCredential userCredential = await _auth
-//           .createUserWithEmailAndPassword(email: email, password: password);
-// //save user info in a sep doc
-//       await _firestore.collection("Users").doc(userCredential.user!.uid).set(
-//         {
-//           'uid': userCredential.user!.uid,
-//           'email': email,
-//           'role': role,
-//         },
-//       );
-
-//       return userCredential;
-//     } on FirebaseAuthException catch (e) {
-//       throw Exception(e.code);
-//     }
-//   }
-
-  //sign out
+  // Sign out
   Future<void> signOut() async {
-    return await _auth.signOut();
+    await _auth.signOut();
   }
 }

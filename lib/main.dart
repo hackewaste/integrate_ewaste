@@ -3,8 +3,10 @@
 
 
 import 'package:ewaste/data/services/detection_billing_services.dart';
+import 'package:ewaste/presentations/volunteer/home/VolunteerHome.dart';
 import 'package:ewaste/pages/dropImage.dart';
 import 'package:ewaste/pages/info.dart';
+import 'package:ewaste/pages/login.dart';
 import 'package:ewaste/pages/struserhome.dart';
 import 'package:ewaste/presentations/user/B2B/Details/enter_details_page.dart';
 import 'package:ewaste/presentations/user/DisposalLocation/disposal_locations_page.dart';
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'EcoElectronic',
       debugShowCheckedModeBanner: false,
-      home: DetectionPageF(),
+      home: Login(),
       theme: ThemeData(
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
