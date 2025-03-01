@@ -1,6 +1,7 @@
+import 'package:ewaste/presentations/volunteer/requestmap.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'package:cloud_firestore/cloud_firestore.dart'; 
 import 'package:ewaste/data/services/volunteer_service.dart';
 
 class VolunteerRequestsPage extends StatefulWidget {
@@ -17,8 +18,8 @@ class _VolunteerRequestsPageState extends State<VolunteerRequestsPage> {
       appBar: AppBar(title: const Text("Available Pickup Requests")),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('requests') // Replace with your Firestore collection
-            .where('status', isEqualTo: 'pending') // Filter by pending status
+            .collection('requests')
+            .where('status', isEqualTo: 'pending') 
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -33,7 +34,6 @@ class _VolunteerRequestsPageState extends State<VolunteerRequestsPage> {
             return {
               'id': doc.id,
               'totalCredits': doc['totalCredits'],
-              // Add other fields as needed
             };
           }).toList();
 
@@ -60,7 +60,7 @@ class _VolunteerRequestsPageState extends State<VolunteerRequestsPage> {
   }
 
   Future<void> _acceptRequest(String requestId) async {
-    User? user = FirebaseAuth.instance.currentUser; // Get logged-in volunteer
+    User? user = FirebaseAuth.instance.currentUser; 
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Not logged in! Please sign in first.")),
@@ -68,11 +68,10 @@ class _VolunteerRequestsPageState extends State<VolunteerRequestsPage> {
       return;
     }
 
-    String volunteerId = user.uid; // Firebase UID
-    String? volunteerName = user.displayName; // Get name if set
+    String volunteerId = user.uid; 
+    String? volunteerName = user.displayName; 
 
     if (volunteerName == null) {
-      // Fetch from Firestore if `displayName` is not available
       volunteerName = await _volunteerService.getVolunteerName(volunteerId);
     }
 
@@ -85,6 +84,14 @@ class _VolunteerRequestsPageState extends State<VolunteerRequestsPage> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Request Accepted!")),
+      );
+
+      // **Navigate to RequestMapPage after accepting**
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VolunteerRequestPage(requestId: requestId),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
