@@ -4,7 +4,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class VolunteerRequestPage extends StatefulWidget {
-  final String requestId; // Accept request ID from previous screen
+  final String requestId;
 
   const VolunteerRequestPage({Key? key, required this.requestId}) : super(key: key);
 
@@ -14,6 +14,7 @@ class VolunteerRequestPage extends StatefulWidget {
 
 class _VolunteerRequestPageState extends State<VolunteerRequestPage> {
   LatLng? _userLocation;
+  LatLng? _volunteerLocation;
   String? userName;
   String? address;
   String? itemName;
@@ -29,23 +30,50 @@ class _VolunteerRequestPageState extends State<VolunteerRequestPage> {
   Future<void> _fetchRequestData() async {
     try {
       FirebaseFirestore firestore = FirebaseFirestore.instance;
+
       DocumentSnapshot requestSnapshot = await firestore
           .collection('requests')
-          .doc(widget.requestId) // Use dynamic request ID
+          .doc(widget.requestId)
           .get();
 
       if (requestSnapshot.exists) {
-        var data = requestSnapshot.data() as Map<String, dynamic>;
+        var requestData = requestSnapshot.data() as Map<String, dynamic>;
+        String userId = requestData['userId'];
+        String volunteerId = requestData['assignedVolunteerId'];
+
+        DocumentSnapshot userSnapshot = await firestore
+            .collection('Users')
+            .doc(userId)
+            .get();
+
+        String userNameFetched = userSnapshot.exists
+            ? userSnapshot['name']
+            : 'Unknown';
+
+        DocumentSnapshot volunteerSnapshot = await firestore
+            .collection('Volunteers')
+            .doc(volunteerId)
+            .get();
+
+        if (volunteerSnapshot.exists) {
+          var volunteerData = volunteerSnapshot.data() as Map<String, dynamic>;
+          _volunteerLocation = LatLng(
+            volunteerData['location']['latitude'],
+            volunteerData['location']['longitude'],
+          );
+        }
 
         setState(() {
-          userName = data['name'];
-          address = data['pickupAddress']['address'];
-          itemName = data['name'];
-          quantity = 1; 
-          creditPoints = data['credits'];
+          userName = userNameFetched;
+          address = requestData['pickupAddress']['address'];
+          itemName = requestData['eWasteItems']
+              .map((item) => item['name'])
+              .join(', ');
+          quantity = requestData['eWasteItems'].length;
+          creditPoints = requestData['totalCredits'];
           _userLocation = LatLng(
-            data['pickupAddress']['latitude'],
-            data['pickupAddress']['longitude'],
+            requestData['pickupAddress']['latitude'],
+            requestData['pickupAddress']['longitude'],
           );
         });
       }
@@ -95,10 +123,25 @@ class _VolunteerRequestPageState extends State<VolunteerRequestPage> {
                               point: _userLocation!,
                               child: Icon(Icons.location_pin, color: Colors.red, size: 40),
                             ),
+                            if (_volunteerLocation != null)
+                              Marker(
+                                width: 50.0,
+                                height: 50.0,
+                                point: _volunteerLocation!,
+                                child: Icon(Icons.person_pin_circle, color: Colors.blue, size: 40),
+                              ),
                           ],
                         ),
-                      ],
+                      ],//9hm6
                     ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Handle reached location logic
+                      print("Volunteer reached the location");
+                    },
+                    child: Text("Reached the Location"),
                   ),
                 ],
               ),
