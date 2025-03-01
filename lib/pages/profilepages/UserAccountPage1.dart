@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ewaste/pages/profilepages/UserAccPage2.dart';
 import 'package:ewaste/pages/volunteerpages/theme_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:ewaste/pages/userHomePage.dart';
-import 'package:ewaste/services/auth_service.dart';
+
 import 'package:ewaste/pages/login.dart';
 import 'package:ewaste/pages/user_credits.dart';
 import 'package:ewaste/pages/profilepages/activitylog.dart';

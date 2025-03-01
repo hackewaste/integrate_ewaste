@@ -225,6 +225,8 @@ class _DetectionPageState extends State<DetectionPage> {
   final List<Map<String, dynamic>> _detectionResults = []; // Updated type
   bool _isProcessing = false;
 
+  // Compress an image
+
   // Pick multiple images from the gallery
   Future<void> _pickImages() async {
     final picker = ImagePicker();
@@ -237,8 +239,6 @@ class _DetectionPageState extends State<DetectionPage> {
       });
     }
   }
-
-  // Compress an image
   Future<File> compressImage(File imageFile) async {
     final bytes = await imageFile.readAsBytes();
     final originalImage = img.decodeImage(bytes)!;
