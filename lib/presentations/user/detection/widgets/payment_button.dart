@@ -1,3 +1,4 @@
+import 'package:ewaste/data/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ewaste/data/models/selected_items_provider.dart';
@@ -13,6 +14,8 @@ class PaymentButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: () async {
         var selectedItemsProvider = Provider.of<SelectedItemsProvider>(context, listen: false);
+        var authService = AuthService();
+        var currentUser = authService.currentUser();
 
         // Convert selected items to eWasteItems format
         List<Map<String, dynamic>> eWasteItems = selectedItemsProvider.selectedItems.entries.expand((categoryEntry) {
@@ -29,7 +32,7 @@ class PaymentButton extends StatelessWidget {
         }).toList();
 
         int totalCredits = selectedItemsProvider.getTotalCredits();
-        String userId = "user123"; // Replace with actual user ID from AuthProvider
+         String userId = currentUser!.uid;
 
         String? requestId = await RequestService().createRequest(
           userId: userId,
