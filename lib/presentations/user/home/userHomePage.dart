@@ -49,8 +49,7 @@ class _UserHomePageState extends State<UserHomePage> {
               const SizedBox(height: 24.0),
               B2BPostSection(context),
               const SizedBox(height: 24.0),
-              EnvironmentalImpactCard(),
-              const SizedBox(height: 24.0),
+              
               upcomingEventsSection(context), 
               const SizedBox(height: 24.0),
               EnvironmentalImpactCard(),
