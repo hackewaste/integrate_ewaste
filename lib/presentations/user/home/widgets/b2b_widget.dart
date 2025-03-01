@@ -10,14 +10,14 @@ Widget B2BPostSection(BuildContext context) {
       );
     },
     child: Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [Colors.green[50]!, Colors.green[100]!],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(12.0),
         boxShadow: [
           BoxShadow(
             color: Colors.green.withOpacity(0.2),
@@ -28,7 +28,7 @@ Widget B2BPostSection(BuildContext context) {
         ],
         border: Border.all(
           color: Colors.green[200]!,
-          width: 1.5,
+          width: 1.2,
         ),
       ),
       child: Column(
@@ -38,28 +38,28 @@ Widget B2BPostSection(BuildContext context) {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: Colors.green[700],
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Text(
                   'B2B',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: 13,
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
-              const Expanded(
+              const SizedBox(width: 8),
+              Expanded(
                 child: Text(
                   'Business E-Waste Solution',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                    color: Colors.green[800],
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -67,58 +67,54 @@ Widget B2BPostSection(BuildContext context) {
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
           // Description
           const Text(
-            'Specialized services for corporate electronic waste disposal and recycling of office equipment',
+            'Corporate e-waste disposal & office equipment recycling services.',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               color: Colors.black87,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // Main content with image and button
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Image
-              Flexible(
-                flex: 3,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    "assets/delivery.png",
-                    height: 100, // Reduced image size
-                    fit: BoxFit.cover,
-                  ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  "assets/delivery.png",
+                  height: 80, // Adjusted height to prevent overflow
+                  width: 80, // Ensuring it fits within layout
+                  fit: BoxFit.cover,
                 ),
               ),
 
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
 
-              // Right side with features and button
-              Flexible(
-                flex: 2,
+              // Features and button
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildFeatureItem(Icons.business, 'Bulk disposal'),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 5),
                     _buildFeatureItem(Icons.local_shipping, 'On-site pickup'),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 5),
                     _buildFeatureItem(Icons.assignment, 'Compliance reports'),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
 
                     // CTA Button
                     SizedBox(
-                      width: double.infinity, // Ensures the button is well-placed
+                      width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.push(
@@ -129,17 +125,17 @@ Widget B2BPostSection(BuildContext context) {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green[700],
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 10.0),
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
+                            borderRadius: BorderRadius.circular(6.0),
                           ),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('Request Service'),
+                            Text('Request Service', style: TextStyle(fontSize: 12)),
                             SizedBox(width: 4),
-                            Icon(Icons.arrow_forward, size: 16),
+                            Icon(Icons.arrow_forward, size: 14),
                           ],
                         ),
                       ),
@@ -150,23 +146,23 @@ Widget B2BPostSection(BuildContext context) {
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
           // Bottom info note
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(6),
               border: Border.all(color: Colors.green[200]!),
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, color: Colors.green[700], size: 20),
-                const SizedBox(width: 8),
+                Icon(Icons.info_outline, color: Colors.green[700], size: 18),
+                const SizedBox(width: 6),
                 const Expanded(
                   child: Text(
-                    'Ideal for offices, schools, and organizations with large quantities of e-waste',
+                    'Ideal for offices, schools, and organizations with large e-waste.',
                     style: TextStyle(fontSize: 12),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -185,15 +181,12 @@ Widget B2BPostSection(BuildContext context) {
 Widget _buildFeatureItem(IconData icon, String text) {
   return Row(
     children: [
-      Icon(icon, size: 16, color: Colors.green[700]),
-      const SizedBox(width: 6),
-      Expanded( // Prevents text overflow
+      Icon(icon, size: 14, color: Colors.green[700]),
+      const SizedBox(width: 5),
+      Expanded(
         child: Text(
           text,
-          style: const TextStyle(
-            fontSize: 13,
-            color: Colors.black87,
-          ),
+          style: const TextStyle(fontSize: 12, color: Colors.black87),
           overflow: TextOverflow.ellipsis,
         ),
       ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../pages/NotificationPage.dart';
+
 class UserAppbar extends StatelessWidget implements PreferredSizeWidget{
   const UserAppbar({super.key});
 
@@ -14,7 +16,13 @@ class UserAppbar extends StatelessWidget implements PreferredSizeWidget{
       actions: [
         IconButton(
           icon: const Icon(Icons.notifications),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => NotificationPage()),
+            );
+          },
         ),
       ],
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../pages/VolunteerHomePage.dart';
+import 'home/VolunteerHome.dart';
 
 class VolunteerBottomNavigation extends StatefulWidget {
   const VolunteerBottomNavigation({super.key});
@@ -24,21 +25,21 @@ class _VolunteerBottomNavigationState extends State<VolunteerBottomNavigation> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => const VolunteerHomePage()),
+              builder: (context) => const VolunteerHomePage1()),
         );
         break;
       case 1: // Explore
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => const VolunteerHomePage()), // Replace with your ExplorePage widget
+              builder: (context) => const VolunteerHomePage1()), // Replace with your ExplorePage widget
         );
         break;
       case 2: // Saved
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => const VolunteerHomePage()), // Replace with your SavedPage widget
+              builder: (context) => const VolunteerHomePage1()), // Replace with your SavedPage widget
         );
         break;
       case 3:

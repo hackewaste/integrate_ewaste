@@ -67,8 +67,11 @@ Widget buildDailyActivity() {
           ],
         ),
       ),
+
     ],
+
   );
+
 }
 
 Widget _buildActivityLegendItem(String label, Color color) {

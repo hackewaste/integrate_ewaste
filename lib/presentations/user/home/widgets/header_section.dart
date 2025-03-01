@@ -1,4 +1,5 @@
 
+import 'package:ewaste/presentations/user/detection/detection_page.dart';
 import 'package:ewaste/presentations/user/detection/widgets/detection_page.dart';
 import 'package:flutter/material.dart';
 import 'package:ewaste/pages/dropimageai(working).dart';
@@ -8,7 +9,7 @@ Widget headerSection(BuildContext context) {
     width: double.infinity,
     padding: const EdgeInsets.all(20.0),
     decoration: BoxDecoration(
-      color: Colors.green[100],
+      color: Colors.teal[100],
       borderRadius: BorderRadius.circular(12.0),
     ),
     child: Column(
@@ -19,7 +20,7 @@ Widget headerSection(BuildContext context) {
           style: TextStyle(
             fontSize: 18.0,
             fontWeight: FontWeight.bold,
-            color: Colors.green[900],
+            color: Colors.teal,
           ),
         ),
         const SizedBox(height: 8.0),
@@ -28,7 +29,7 @@ Widget headerSection(BuildContext context) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>  DropImagePage()),
+                  builder: (context) =>  DetectionPageF()),
             );
           },
           child: const Text('Sell'),
