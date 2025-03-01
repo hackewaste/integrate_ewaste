@@ -6,6 +6,7 @@ class SelectedItemsProvider extends ChangeNotifier {
 
   void addItem(EWasteItem item) {
     selectedItems.putIfAbsent(item.category, () => []);
+
     var existingItem = selectedItems[item.category]!.firstWhere(
           (e) => e.name == item.name,
       orElse: () => EWasteItem(name: '', category: '', baseCredit: 0),
@@ -27,22 +28,33 @@ class SelectedItemsProvider extends ChangeNotifier {
       int index = categoryItems.indexWhere((e) => e.name == item.name);
       if (index != -1) {
         if (categoryItems[index].count > 1) {
-          categoryItems[index] = categoryItems[index].copyWith(count: categoryItems[index].count - 1);
+          categoryItems[index] =
+              categoryItems[index].copyWith(count: categoryItems[index].count - 1);
         } else {
-          categoryItems.removeAt(index); // Remove item completely if count reaches 0
+          categoryItems.removeAt(index);
         }
       }
 
-      // If category is empty, remove it from the map
       if (categoryItems.isEmpty) {
         selectedItems.remove(item.category);
       }
 
-      notifyListeners(); // Ensure UI updates
+      notifyListeners();
     }
   }
 
-
+  void addDetectedItems(List<Map<String, dynamic>> detectedItems) {
+    for (var detection in detectedItems) {
+      final ewasteItem = EWasteItem(
+        name: detection["class_name"],
+        category: "AI Detection", // or map to actual category
+        baseCredit: detection["credits"],
+        count: 1,
+      );
+      addItem(ewasteItem);
+    }
+    notifyListeners();
+  }
 
   int getTotalCredits() {
     int total = 0;

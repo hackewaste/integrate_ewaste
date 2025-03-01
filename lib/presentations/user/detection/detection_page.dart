@@ -17,7 +17,7 @@ class DetectionPageF extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            AIDetectionCard(onDetect: _startAIDetection),
+            AIDetectionCard(),
             ManualEntryCard(),
           ],
         ),

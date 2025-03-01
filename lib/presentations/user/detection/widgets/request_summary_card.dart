@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../../../data/models/request_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SummaryCard extends StatefulWidget {
-  final RequestModel request;
-  final String? volunteerName; // New field
+  final String requestId;
 
-  const SummaryCard({Key? key, required this.request, this.volunteerName}) : super(key: key);
+  const SummaryCard({Key? key, required this.requestId}) : super(key: key);
 
   @override
   _SummaryCardState createState() => _SummaryCardState();
@@ -15,95 +14,128 @@ class SummaryCard extends StatefulWidget {
 class _SummaryCardState extends State<SummaryCard> {
   bool _isAddressExpanded = false;
   bool _isRequestIdExpanded = false;
+  bool _isVolunteerNameExpanded = false;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      shadowColor: Colors.black26,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue.shade300, Colors.blue.shade600],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance.collection('requests').doc(widget.requestId).snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data == null || !snapshot.data!.exists) {
+          return const Center(child: Text("Request not found"));
+        }
+
+        var requestData = snapshot.data!.data() as Map<String, dynamic>?;
+        if (requestData == null) {
+          return const Center(child: Text("Invalid request data"));
+        }
+
+        String status = requestData['status']?.toString() ?? "pending";
+        String? volunteerName = requestData['assignedVolunteerName']?.toString();
+        //String requestId = requestData['requestId']?.toString() ?? "Unknown";
+        String pickupAddress = requestData['pickupAddress']?['address'] ?? "Unknown Address";
+        int totalCredits = requestData['totalCredits'] ?? 0;
+
+        return Card(
+          elevation: 6,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shadowColor: Colors.black26,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue.shade300, Colors.blue.shade600],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.receipt_long, color: Colors.white, size: 28),
-                const SizedBox(width: 10),
-                Text(
-                  "Request Details",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                Row(
+                  children: [
+                    Icon(Icons.receipt_long, color: Colors.white, size: 28),
+                    const SizedBox(width: 10),
+                    Text(
+                      "Request Details",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+
+                // Request ID - Expandable Tile
+                _buildExpandableTile(
+                  title: "Request ID",
+                  value: widget.requestId,
+                  isExpanded: _isRequestIdExpanded,
+                  onTap: () {
+                    setState(() {
+                      _isRequestIdExpanded = !_isRequestIdExpanded;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 10),
+
+                // Pickup Address - Expandable Tile
+                _buildExpandableTile(
+                  title: "Pickup Address",
+                  value: pickupAddress,
+                  isExpanded: _isAddressExpanded,
+                  onTap: () {
+                    setState(() {
+                      _isAddressExpanded = !_isAddressExpanded;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 10),
+
+                // Total Credits
+                _buildDetailRow("💰 Total Credits", "$totalCredits points"),
+                const SizedBox(height: 10),
+
+                // Volunteer Name - Expandable Tile (If Assigned)
+                if (volunteerName != null && (status == "assigned" || status == "picked"))
+                  _buildExpandableTile(
+                    title: "Volunteer Name",
+                    value: volunteerName,
+                    isExpanded: _isVolunteerNameExpanded,
+                    onTap: () {
+                      setState(() {
+                        _isVolunteerNameExpanded = !_isVolunteerNameExpanded;
+                      });
+                    },
+                  ),
+
+                const SizedBox(height: 20),
+
+                // Processing or Volunteer Assigned text
+                Center(
+                  child: Shimmer.fromColors(
+                    baseColor: Colors.white.withOpacity(0.6),
+                    highlightColor: Colors.white,
+                    child: Text(
+                      status == "assigned" ? "Volunteer Assigned" : "Processing your request...",
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 15),
-
-            // Request ID - Expandable Tile
-            _buildExpandableTile(
-              title: "Request ID",
-              value: widget.request.requestId,
-              isExpanded: _isRequestIdExpanded,
-              onTap: () {
-                setState(() {
-                  _isRequestIdExpanded = !_isRequestIdExpanded;
-                });
-              },
-            ),
-
-            const SizedBox(height: 10),
-
-            // Pickup Address - Expandable Tile
-            _buildExpandableTile(
-              title: "Pickup Address",
-              value: widget.request.pickupAddress.address,
-              isExpanded: _isAddressExpanded,
-              onTap: () {
-                setState(() {
-                  _isAddressExpanded = !_isAddressExpanded;
-                });
-              },
-            ),
-
-            const SizedBox(height: 10),
-
-            // Total Credits
-            _buildDetailRow("💰 Total Credits", "${widget.request.totalCredits} points"),
-            const SizedBox(height: 10),
-
-            // Show Volunteer Name if Assigned
-            if (widget.volunteerName != null &&
-                (widget.request.status == "assigned" || widget.request.status == "picked"))
-              _buildDetailRow("👤 Volunteer", widget.volunteerName!),
-
-            const SizedBox(height: 20),
-
-            // Processing Shimmer
-            Center(
-              child: Shimmer.fromColors(
-                baseColor: Colors.white.withOpacity(0.6),
-                highlightColor: Colors.white,
-                child: Text(
-                  "Processing your request...",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

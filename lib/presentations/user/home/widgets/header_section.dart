@@ -1,3 +1,5 @@
+
+import 'package:ewaste/presentations/user/detection/widgets/detection_page.dart';
 import 'package:flutter/material.dart';
 import 'package:ewaste/pages/dropimageai(working).dart';
 
@@ -20,29 +22,16 @@ Widget headerSection(BuildContext context) {
             color: Colors.green[900],
           ),
         ),
-        const SizedBox(height: 12.0),
-        SizedBox(
-          width: double.infinity, // Makes the button full-width
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green[700],
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DropImagePage()),
-              );
-            },
-            child: const Text(
-              "Sell Now",
-              style: TextStyle(fontSize: 16.0),
-            ),
-          ),
+        const SizedBox(height: 8.0),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>  DropImagePage()),
+            );
+          },
+          child: const Text('Sell'),
         ),
       ],
     ),

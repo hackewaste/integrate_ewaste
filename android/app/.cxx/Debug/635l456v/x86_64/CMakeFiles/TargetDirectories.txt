@@ -1,0 +1,2 @@
+C:/Users/NKanungo/Desktop/flutter_projects/integrate_ewaste/android/app/.cxx/Debug/635l456v/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/NKanungo/Desktop/flutter_projects/integrate_ewaste/android/app/.cxx/Debug/635l456v/x86_64/CMakeFiles/rebuild_cache.dir
