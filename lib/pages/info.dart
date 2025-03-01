@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../presentations/user/user_bottom_navigation.dart';
+
 class InfoPage extends StatefulWidget {
   const InfoPage({super.key});
 
@@ -77,31 +79,7 @@ class _InfoPageState extends State<InfoPage> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedBottomNavIndex, // Independent of the top navigation
-        selectedItemColor: Colors.deepPurple,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.black,
-        onTap: _onBottomNavSelected, // Updates bottom navigation index
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'Explore',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'Saved',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
+        bottomNavigationBar: UserBottomNavigation(currentIndex: 1,)
     );
   }
 }

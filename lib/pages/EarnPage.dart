@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../presentations/user/user_bottom_navigation.dart';
 import 'contacts-list.dart';
 import 'redeem.dart';
 import 'history.dart';
@@ -203,31 +204,7 @@ class _EarnPageState extends State<EarnPage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.blue[100],
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home), 
-            label: 'Home',
-            backgroundColor: Colors.black
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore), 
-            label: 'Explore'
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.save), 
-            label: 'Redeem'
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person), 
-            label: 'Profile'
-          ),
-        ],
-      ),
+        bottomNavigationBar: UserBottomNavigation(currentIndex: 2,)
     );
   }
 

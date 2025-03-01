@@ -1,84 +1,55 @@
+import 'package:flutter/material.dart';
 import 'package:ewaste/pages/EarnPage.dart';
 import 'package:ewaste/pages/info.dart';
 import 'package:ewaste/pages/profilepages/UserAccountPage1.dart';
-import 'package:flutter/material.dart';
+import 'package:ewaste/presentations/user/home/userHomePage.dart';
 
-import '../../pages/VolunteerHomePage.dart';
+class UserBottomNavigation extends StatelessWidget {
+  final int currentIndex;
 
-import 'home/userHomePage.dart';
+  const UserBottomNavigation({Key? key, required this.currentIndex}) : super(key: key);
 
-class UserBottomNavigation extends StatefulWidget {
-  const UserBottomNavigation({super.key});
+  void _onTabSelected(BuildContext context, int index) {
+    if (index == currentIndex) return; // Prevent reloading the same page
 
-  @override
-  State<UserBottomNavigation> createState() => _UserBottomNavigationState();
-}
-
-class _UserBottomNavigationState extends State<UserBottomNavigation> {
-  int _currentIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-
-
-    // Navigation logic for each index
     switch (index) {
-      case 0: // Home
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const UserHomePage()),
-        );
+      case 0:
+        Navigator.pushReplacement(context, _createRoute(const UserHomePage()));
         break;
-      case 1: // Explore
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const InfoPage()), // Replace with your ExplorePage widget
-        );
+      case 1:
+        Navigator.pushReplacement(context, _createRoute(const InfoPage()));
         break;
-      case 2: // Saved
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const EarnPage()), // Replace with your SavedPage widget
-        );
+      case 2:
+        Navigator.pushReplacement(context, _createRoute(const EarnPage()));
         break;
       case 3:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => UserAccountPage(title: "")), // Replace with your SavedPage widget
-        );
+        Navigator.pushReplacement(context, _createRoute(UserAccountPage(title: "")));
         break;
     }
   }
+
+  PageRouteBuilder _createRoute(Widget page) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(opacity: animation, child: child);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: _currentIndex,
-      selectedItemColor: Colors.deepPurple,
+      currentIndex: currentIndex,
+      onTap: (index) => _onTabSelected(context, index),
+      type: BottomNavigationBarType.fixed,
+      selectedItemColor: Colors.blue,
       unselectedItemColor: Colors.grey,
-      onTap: _onItemTapped,
       items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.explore),
-          label: 'Explore',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.bookmark),
-          label: 'Redeem',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+        BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
+        BottomNavigationBarItem(icon: Icon(Icons.card_giftcard), label: 'Redeem'),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
       ],
     );
   }

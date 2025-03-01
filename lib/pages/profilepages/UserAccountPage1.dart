@@ -12,6 +12,8 @@ import 'package:ewaste/pages/user_credits.dart';
 import 'package:ewaste/pages/profilepages/activitylog.dart';
 import 'package:ewaste/pages/profilepages/helpsupport.dart';
 
+import '../../presentations/user/user_bottom_navigation.dart';
+
 class UserAccountPage extends StatefulWidget {
   const UserAccountPage({super.key, required this.title});
 
@@ -179,30 +181,7 @@ _buildOptionTile(
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        selectedItemColor: Colors.deepPurple,
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'Explore',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'Saved',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
+        bottomNavigationBar: UserBottomNavigation(currentIndex: 3,)
     );
   }
 

@@ -73,7 +73,7 @@ class _UserHomePageState extends State<UserHomePage> {
           ),
         ),
       ),
-      bottomNavigationBar: UserBottomNavigation()
+      bottomNavigationBar: UserBottomNavigation(currentIndex: 0,)
     );
   }
 }
