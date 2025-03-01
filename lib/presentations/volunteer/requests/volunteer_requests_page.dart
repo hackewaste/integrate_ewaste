@@ -11,16 +11,16 @@ class VolunteerRequestsPage extends StatefulWidget {
 
 class _VolunteerRequestsPageState extends State<VolunteerRequestsPage> {
   final VolunteerRequestService _volunteerService = VolunteerRequestService();
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Available Pickup Requests")),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('requests')
-            .where('status', isEqualTo: 'pending') 
-            .snapshots(),
+  stream: FirebaseFirestore.instance
+      .collection('requests')
+      .where('status', isEqualTo: 'pending')
+      .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -38,22 +38,56 @@ class _VolunteerRequestsPageState extends State<VolunteerRequestsPage> {
           }).toList();
 
           return ListView.builder(
-            itemCount: requests.length,
-            itemBuilder: (context, index) {
-              var request = requests[index];
-              return Card(
-                margin: const EdgeInsets.all(10),
-                child: ListTile(
-                  title: Text("Request ID: ${request['id']}"),
-                  subtitle: Text("Credits: ${request['totalCredits']}"),
-                  trailing: ElevatedButton(
-                    onPressed: () => _acceptRequest(request['id']),
-                    child: const Text("Accept"),
-                  ),
-                ),
-              );
-            },
-          );
+  itemCount: requests.length,
+  itemBuilder: (context, index) {
+    var request = requests[index];
+    // NEW FUNCTION: Fetch user's name from requestId
+Future<String> _fetchUsernameFromRequestId(String requestId) async {
+  try {
+    DocumentSnapshot requestDoc = await FirebaseFirestore.instance
+        .collection('requests')
+        .doc(requestId)
+        .get();
+
+    if (requestDoc.exists) {
+      String userId = requestDoc['userId']; // Assuming 'userId' exists in the request document
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        return userDoc['name']; // Fetch the user's name from Users collection
+      }
+    }
+  } catch (e) {
+    print("Error fetching username: $e");
+  }
+  return "Unknown User"; // Default fallback
+}
+
+    // NEW CODE: Fetch username from requestId
+    return FutureBuilder<String>(
+      future: _fetchUsernameFromRequestId(request['id']),
+      builder: (context, userSnapshot) {
+        String username = userSnapshot.data ?? "Unknown User"; // Default if not found
+
+        return Card(
+          margin: const EdgeInsets.all(10),
+          child: ListTile(
+            title: Text("User: $username"),
+            subtitle: Text("Credits: ${request['totalCredits']}"), // Updated UI
+            trailing: ElevatedButton(
+              onPressed: () => _acceptRequest(request['id']),
+              child: const Text("Accept"),
+            ),
+          ),
+        );
+      },
+    );
+  },
+);
         },
       ),
     );
