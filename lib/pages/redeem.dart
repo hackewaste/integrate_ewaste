@@ -1,211 +1,68 @@
 import 'package:flutter/material.dart';
 
-// Add the color scheme class
 class AppColors {
-  // Background Colors
-  static const Color background = Color(0xFFFFFDF9); // Light Cream
-  static const Color bg200 = Color(0xFFF5F3EF); // Off-white
-  static const Color bg300 = Color(0xFFD9D9D9); // Light Gray
-
-  // Primary Colors (Soft Green)
-  static const Color primary = Color(0xFF81C784); // Soft Green
-  static const Color primary200 = Color(0xFFAED581); // Light Green
-  static const Color primary300 = Color(0xFFDCE775); // Yellowish Green
-
-  // Accent Colors (Bright & Energetic)
-  static const Color accent = Color(0xFFFFB703); // Bright Yellow
-  static const Color accent200 = Color(0xFFF57F17); // Deep Orange
-  static const Color accent300 = Color(0xFFFF7043); // Warm Orange
-
-  // Additional Colors (Contrast & Highlights)
-  static const Color red = Color(0xFFD62828); // Deep Red
-  static const Color blue = Color(0xFF0077B6); // Electric Blue
-  static const Color black = Color(0xFF333333); // Dark Grayish Black
-
-  // Text Colors
-  static const Color text = Color(0xFF4E342E); // Brownish Gray for readability
-  static const Color text200 = Color(0xFF6D4C41); // Softer Brown
-  static const Color textAlt = Color(0xFF1565C0); // Brighter Blue for contrast
-
-  // Status Bar & App Bar Colors
-  static const Color statusBarColor = Color(0xFF558B2F); // Dark Greenish tone
-  static const Color appBarColor = Color(0xFF37474F); // Dark Blue-Grey
-
-  // Navigation Colors
-  static const Color selectedNavColor = Color(0xFF2E7D32); // Deep Green
-  static const Color unselectedNavColor = Color(0xFFBDBDBD); // Light Grayish tone
-
-  // Card Colors
-  static const Color cardBackground = Color(0xFFE8F5E9); // Very light green shade
+  static const Color primaryColor = Color(0xFF4CAF50);
+  static const Color backgroundColor = Color(0xFFF5F5F5);
+  static const Color white = Colors.white;
+  static const Color textColor = Colors.black87;
+  static const Color buttonColor = Color(0xFF388E3C);
 }
 
 class RewardsScreen extends StatefulWidget {
-  const RewardsScreen({super.key});
-
   @override
-  State<RewardsScreen> createState() => _RewardsScreenState();
+  _RewardsScreenState createState() => _RewardsScreenState();
 }
 
 class _RewardsScreenState extends State<RewardsScreen> {
-  int _selectedIndex = 2; // Default selected tab
-  int availableCredits = 45; // Example: User's available credits
+  int _selectedIndex = 2;
+  int availableCredits = 2500;
 
-  // Company details with unique coupon codes
   final List<Map<String, dynamic>> vouchers = [
-    {
-      'logo': 'assets/amazon.png',
-      'couponCode': 'AMZ-2024-XYZ123',
-      'creditsRequired': 20,
-    },
-    {
-      'logo': 'assets/flipkart.png',
-      'couponCode': 'FLIP-2024-ABC456',
-      'creditsRequired': 30,
-    },
-    {
-      'logo': 'assets/swiggy.png',
-      'couponCode': 'SWIGGY-2024-PQR789',
-      'creditsRequired': 25,
-    },
-    {
-      'logo': 'assets/zomato.png',
-      'couponCode': 'ZOMATO-2024-DEF321',
-      'creditsRequired': 35,
-    },
-    {
-      'logo': 'assets/myntra.png',
-      'couponCode': 'MYNTRA-2024-LMN654',
-      'creditsRequired': 40,
-    },
+    {"logo": "assets/amazon.png", "couponCode": "AMZ100", "creditsRequired": 1000},
+    {"logo": "assets/flipkart.png", "couponCode": "FLIP500", "creditsRequired": 2000},
+    {"logo": "assets/swiggy.png", "couponCode": "SWIGGY250", "creditsRequired": 1500},
+    {"logo": "assets/zomato.png", "couponCode": "ZOMATO300", "creditsRequired": 1800},
+    {"logo": "assets/myntra.png", "couponCode": "MYNTRA200", "creditsRequired": 1200},
   ];
+
+  void _redeemVoucher(int requiredCredits, String couponCode) {
+    if (availableCredits < requiredCredits) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Not enough credits!"), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    setState(() => availableCredits -= requiredCredits);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Coupon Redeemed: $couponCode"), backgroundColor: Colors.green),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(120),
-        child: Column(
-          children: [
-            // Custom Status Bar
-            Container(
-              color: AppColors.statusBarColor,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('1:09', style: TextStyle(color: Colors.white)),
-                  Row(
-                    children: [
-                      const Text('25%', style: TextStyle(color: Colors.white)),
-                      const SizedBox(width: 4),
-                      Icon(Icons.battery_3_bar, color: Colors.white.withOpacity(0.8)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            // Custom App Bar
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: AppColors.appBarColor,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: AppColors.accent,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Center(child: Text('🪙', style: TextStyle(fontSize: 20))),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '$availableCredits Credits',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Text(
-                            'Available →',
-                            style: TextStyle(color: AppColors.bg200, fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.card_giftcard_outlined, color: AppColors.accent),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+      backgroundColor: AppColors.backgroundColor,
+      appBar: AppBar(
+        title: Text("Rewards", style: TextStyle(color: AppColors.white)),
+        backgroundColor: AppColors.primaryColor,
       ),
       body: Column(
         children: [
-          // Navigation Bar
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            color: AppColors.bg200,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(Icons.home_outlined, 'Home', 0),
-                _buildNavItem(Icons.more_horiz, 'Earn', 1),
-                _buildNavItem(Icons.card_giftcard, 'Redeem', 2, isSelected: true),
-                _buildNavItem(Icons.history, 'History', 3),
-              ],
-            ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text("Available Credits: $availableCredits", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
-          Divider(height: 1, color: AppColors.bg300),
-          // Voucher List
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.all(16),
               itemCount: vouchers.length,
               itemBuilder: (context, index) {
                 return VoucherCard(
                   logo: vouchers[index]['logo'],
                   couponCode: vouchers[index]['couponCode'],
                   creditsRequired: vouchers[index]['creditsRequired'],
-                  availableCredits: availableCredits,
-                  onRedeem: () {
-                    setState(() {
-                      int requiredCredits = vouchers[index]['creditsRequired'] as int;
-                      if (availableCredits >= requiredCredits) {
-                        availableCredits -= requiredCredits;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              "🎉 Coupon Redeemed! Use Code: ${vouchers[index]['couponCode']}",
-                            ),
-                            backgroundColor: AppColors.primary,
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text("❌ Not enough credits!"),
-                            backgroundColor: AppColors.red,
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                      }
-                    });
-                  },
+                  onRedeem: () => _redeemVoucher(vouchers[index]['creditsRequired'], vouchers[index]['couponCode']),
                 );
               },
             ),
@@ -214,129 +71,44 @@ class _RewardsScreenState extends State<RewardsScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        selectedItemColor: AppColors.selectedNavColor,
-        unselectedItemColor: AppColors.unselectedNavColor,
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.card_giftcard), label: 'Trial'),
-          BottomNavigationBarItem(icon: Icon(Icons.store), label: 'Shop'),
-          BottomNavigationBarItem(icon: Icon(Icons.card_giftcard), label: 'Rewards'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Account'),
-        ],
         onTap: (index) => setState(() => _selectedIndex = index),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: "History"),
+          BottomNavigationBarItem(icon: Icon(Icons.card_giftcard), label: "Rewards"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
       ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, int index, {bool isSelected = false}) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary200 : AppColors.bg300,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            icon,
-            color: isSelected ? AppColors.selectedNavColor : AppColors.unselectedNavColor,
-            size: 24,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? AppColors.selectedNavColor : AppColors.unselectedNavColor,
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-          ),
-        ),
-      ],
     );
   }
 }
 
-// Voucher Card UI
 class VoucherCard extends StatelessWidget {
   final String logo;
   final String couponCode;
   final int creditsRequired;
-  final int availableCredits;
   final VoidCallback onRedeem;
 
   const VoucherCard({
-    super.key,
     required this.logo,
     required this.couponCode,
     required this.creditsRequired,
-    required this.availableCredits,
     required this.onRedeem,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.bg300),
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Image.asset(logo, width: 64, height: 64), // Company Logo
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    'Redeem for $creditsRequired Credits',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.text,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.bg200,
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: availableCredits >= creditsRequired ? onRedeem : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: availableCredits >= creditsRequired 
-                          ? AppColors.primary 
-                          : AppColors.bg300,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: Text(
-                      'Redeem Now',
-                      style: TextStyle(
-                        color: availableCredits >= creditsRequired 
-                            ? Colors.white 
-                            : AppColors.text200,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: ListTile(
+        leading: Image.asset(logo, width: 50, height: 50),
+        title: Text("Coupon: $couponCode", style: TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text("Credits Required: $creditsRequired"),
+        trailing: ElevatedButton(
+          onPressed: onRedeem,
+          style: ElevatedButton.styleFrom(backgroundColor: AppColors.buttonColor),
+          child: Text("Redeem"),
+        ),
       ),
     );
   }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'contacts-list.dart';
+import 'redeem.dart';
+import 'history.dart';
 
 class EarnPage extends StatefulWidget {
   const EarnPage({super.key});
@@ -53,12 +56,7 @@ class _EarnPageState extends State<EarnPage> {
             ),
           ],
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Icon(Icons.calendar_today, color: Colors.black),
-          ),
-        ],
+        // Removed calendar icon from actions
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -169,7 +167,15 @@ class _EarnPageState extends State<EarnPage> {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Navigate to contacts page when button is pressed
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ContactsPage(),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue[100],
                       minimumSize: const Size(double.infinity, 50),
@@ -200,11 +206,26 @@ class _EarnPageState extends State<EarnPage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
-        onTap: _onItemTapped, // Use separate function for onTap
+        backgroundColor: Colors.blue[100],
+        onTap: _onItemTapped,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'), // Explore
-          BottomNavigationBarItem(icon: Icon(Icons.check_circle_outline), label: 'Redeem'), // Redeem
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'), // Profile
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home), 
+            label: 'Home',
+            backgroundColor: Colors.black
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.explore), 
+            label: 'Explore'
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.save), 
+            label: 'Redeem'
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person), 
+            label: 'Profile'
+          ),
         ],
       ),
     );
@@ -212,28 +233,47 @@ class _EarnPageState extends State<EarnPage> {
 
   Widget _buildNavItem(int index, String label, IconData icon) {
     final isSelected = _selectedIndex == index;
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.brown[100] : Colors.grey[200],
-            shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: () {
+        if (label == 'Redeem') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => RewardsScreen()),
+          );
+        } else if (label == 'History') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const HistoryScreen()),
+          );
+        } else {
+          setState(() {
+            _selectedIndex = index;
+          });
+        }
+      },
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isSelected ? Colors.brown[100] : Colors.grey[200],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: isSelected ? Colors.brown : Colors.grey,
+            ),
           ),
-          child: Icon(
-            icon,
-            color: isSelected ? Colors.brown : Colors.grey,
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Colors.black : Colors.grey,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.black : Colors.grey,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -279,3 +319,4 @@ class _EarnPageState extends State<EarnPage> {
     );
   }
 }
+

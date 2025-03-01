@@ -1,88 +1,144 @@
 import 'package:flutter/material.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:ewaste/presentations/user/home/userHomePage.dart';
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
 
-class GamificationScreen extends StatelessWidget {
+  @override
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  final PageController _pageController = PageController();
+  bool isLastPage = false;
+
+  final List<OnboardingPage> _pages = [
+    OnboardingPage(
+      image: "assets/logo.png",
+      title: "Easy E-Waste Collection",
+      description:
+          "Schedule pickups hassle-free and dispose of your e-waste responsibly.",
+    ),
+    OnboardingPage(
+      image: "assets/logo.png",
+      title: "Earn Rewards While Recycling",
+      description:
+          "Recycle e-waste and earn points that can be redeemed for exclusive rewards.",
+    ),
+    OnboardingPage(
+      image: "assets/logo.png",
+      title: "Track Your Environmental Impact",
+      description:
+          "Monitor your carbon footprint reduction and contribute to a greener planet.",
+    ),
+  ];
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void navigateToHome() {
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => UserHomePage()),
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
+      backgroundColor: Colors.green[50],
+      body: Stack(
         children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 40),
-                  Text(
-                    'Gamification & \nRewards -',
-                    style: TextStyle(
-                      fontSize: 32,
-                      color: Colors.grey[400],
-                      height: 1.2,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        // Decorative leaves
-                        Positioned(
-                          left: 0,
-                          bottom: 100,
-                          child: Image.asset(
-                            'assets/leaves.png',
-                            color: Colors.grey[200],
-                            width: 100,
-                          ),
-                        ),
-                        // Main illustration
-                        Center(
-                          child: Image.asset(
-                            'assets/rewards.png', // Add your reward image
-                            width: 250,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+          PageView.builder(
+            controller: _pageController,
+            itemCount: _pages.length,
+            onPageChanged: (index) {
+              setState(() {
+                isLastPage = index == _pages.length - 1;
+              });
+            },
+            itemBuilder: (context, index) {
+              return _buildPage(_pages[index]);
+            },
+          ),
+          // Skip button
+          Positioned(
+            top: 50,
+            right: 20,
+            child: TextButton(
+              onPressed: navigateToHome,
+              child: Text(
+                "Skip",
+                style: TextStyle(
+                  color: Colors.green[700],
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ),
-          // Slanted Green Section
-          ClipPath(
-            clipper: TopSlantClipper(),
+          // Bottom Controls
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
             child: Container(
-              padding: const EdgeInsets.all(32.0),
-              color: const Color(0xFF7AB896), // Eco-friendly green color
+              padding: const EdgeInsets.all(20.0),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.green[50]!.withOpacity(0),
+                    Colors.green[50]!,
+                  ],
+                ),
+              ),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Automatically shares your real-time location with trusted contacts during critical times, ensuring they know where you are.',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      height: 1.4,
-                      fontWeight: FontWeight.w500,
+                  SmoothPageIndicator(
+                    controller: _pageController,
+                    count: _pages.length,
+                    effect: ExpandingDotsEffect(
+                      activeDotColor: Colors.green[700]!,
+                      dotColor: Colors.green[200]!,
+                      dotHeight: 8,
+                      dotWidth: 8,
+                      spacing: 8,
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 24),
-                  // Dot indicators
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      4,
-                      (index) => Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: index == 1
-                              ? const Color(0xFFE5A0B0) // Pink color
-                              : Colors.white,
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (isLastPage) {
+                          navigateToHome();
+                        } else {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green[700],
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 2,
+                      ),
+                      child: Text(
+                        isLastPage ? "Get Started" : "Next",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -95,21 +151,70 @@ class GamificationScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildPage(OnboardingPage page) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 60, 20, 120),
+        child: Column(
+          children: [
+            Expanded(
+              flex: 5,
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Image.asset(
+                  page.image,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            const SizedBox(height: 40),
+            Expanded(
+              flex: 4,
+              child: Column(
+                children: [
+                  Text(
+                    page.title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green[700],
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    page.description,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-// Custom Clipper for Slanted Top Edge
-class TopSlantClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.lineTo(size.width - 100, 0); // Slant from left to 100px from right
-    path.lineTo(size.width, 40); // Diagonal cut
-    path.lineTo(size.width, size.height); // Bottom-right
-    path.lineTo(0, size.height); // Bottom-left
-    path.close();
-    return path;
-  }
+class OnboardingPage {
+  final String image;
+  final String title;
+  final String description;
 
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+  OnboardingPage({
+    required this.image,
+    required this.title,
+    required this.description,
+  });
 }

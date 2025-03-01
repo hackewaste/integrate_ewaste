@@ -264,7 +264,7 @@ Future<void> _sendImagesToBackend() async {
       _detectionResults.clear();
     });
 
-    final url = Uri.parse('https://e1b8-34-171-89-81.ngrok-free.app/predict');
+    final url = Uri.parse('https://ca47-34-48-156-24.ngrok-free.app/predict');
     final request = http.MultipartRequest('POST', url);
 
     // Compress and attach images

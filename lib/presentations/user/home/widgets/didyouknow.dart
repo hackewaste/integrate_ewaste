@@ -1,9 +1,7 @@
+import 'package:ewaste/presentations/user/DYK/recycling_steps.dart';
 import 'package:flutter/material.dart';
-import '../../DYK/recycling_steps.dart';
 
-
-
-class RecyclingProcessCard extends StatelessWidget {
+class EnvironmentalImpactCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -14,29 +12,89 @@ class RecyclingProcessCard extends StatelessWidget {
         );
       },
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 25, horizontal: 16),
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.teal[100],
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.green, width: 1.5),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min, // Keeps it compact
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(Icons.recycling, color: Colors.teal, size: 30),
-            SizedBox(width: 10),
-            Text(
-              "DID YOU KNOW?",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
+          gradient: LinearGradient(
+            colors: [Colors.green.shade600, Colors.teal.shade500],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 8,
+              offset: Offset(0, 3),
             ),
-            SizedBox(width: 8),
-            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.teal),
           ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            children: [
+              // Background pattern (optional)
+              Positioned(
+                right: -20,
+                bottom: -20,
+                child: Icon(
+                  Icons.eco_rounded,
+                  size: 120,
+                  color: Colors.white.withOpacity(0.2),
+                ),
+              ),
+              
+              // Content
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.nature_people,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Our Environmental Impact",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            "Learn how we're making a difference",
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

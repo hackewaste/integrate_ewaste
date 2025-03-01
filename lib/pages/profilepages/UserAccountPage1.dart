@@ -1,10 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:ewaste/pages/profilepages/UserAccPage2.dart';
-import 'package:ewaste/pages/volunteerpages/theme_provider.dart';
+import 'package:ewaste/pages/profilepages/theme_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:ewaste/pages/userHomePage.dart';
-import 'package:ewaste/services/auth_service.dart';
+import 'package:ewaste/presentations/user/home/userHomePage.dart';
+import 'package:ewaste/data/services/auth_service.dart';
 import 'package:ewaste/pages/login.dart';
 import 'package:ewaste/pages/user_credits.dart';
 import 'package:ewaste/pages/profilepages/activitylog.dart';
@@ -54,7 +54,7 @@ class _UserAccountPage extends State<UserAccountPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => UserHomepage()),
+              builder: (context) => UserHomePage()),
         );
         break;
       case 1: // Explore
