@@ -6,7 +6,8 @@ import '../presentations/user/home/userHomePage.dart';
 import '../pages/volunteerHomePage.dart';
 import '../presentations/volunteer/home/VolunteerHome.dart';
 import 'login.dart';
-
+import 'package:ewaste/pages/onboarding1.dart';
+import 'package:ewaste/pages/login.dart';
 class RegisterPage extends StatefulWidget {
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -16,7 +17,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String _selectedRole = 'User'; // Default role
 
@@ -29,17 +29,13 @@ class _RegisterPageState extends State<RegisterPage> {
         password: _passwordController.text.trim(),
         name: _nameController.text.trim(),
         phone: _phoneController.text.trim(),
-        address: _addressController.text.trim(),
         role: _selectedRole,
       );
 
-      // Redirect based on role
-      if (_selectedRole == 'User') {
+      if (userCredential.user != null) {
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => UserHomePage()));
-      } else {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => VolunteerHomePage1()));
+          context, MaterialPageRoute(builder: (context) => OnboardingScreen(userId: userCredential.user!.uid)),
+        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -62,8 +58,6 @@ class _RegisterPageState extends State<RegisterPage> {
             _buildTextField(_emailController, "Email"),
             SizedBox(height: 12),
             _buildTextField(_phoneController, "Phone"),
-            SizedBox(height: 12),
-            _buildTextField(_addressController, "Address"),
             SizedBox(height: 12),
             _buildTextField(_passwordController, "Password", obscureText: true),
             SizedBox(height: 12),
@@ -89,7 +83,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
               },
               child: Text("Already have an account? Sign In"),
             ),

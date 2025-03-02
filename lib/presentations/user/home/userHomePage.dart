@@ -1,6 +1,9 @@
 import 'package:ewaste/pages/EarnPage.dart';
 import 'package:ewaste/presentations/user/home/widgets/collaboration.dart';
+import 'package:ewaste/presentations/user/home/widgets/disposal_widget.dart';
+import 'package:ewaste/presentations/user/home/widgets/leaderboard_button.dart';
 import 'package:ewaste/presentations/user/user_appbar.dart';
+import 'package:ewaste/presentations/user/user_bottom_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -52,9 +55,9 @@ class _UserHomePageState extends State<UserHomePage> {
               
               upcomingEventsSection(context), 
               const SizedBox(height: 24.0),
-              EnvironmentalImpactCard(),
-               const SizedBox(height: 24.0),
               InviteSection(context),
+              const SizedBox(height: 24.0),
+              DisposalWidget(),
               const SizedBox(height: 24.0),
               ColabSection(context),
               const SizedBox(height: 24.0),
@@ -62,36 +65,14 @@ class _UserHomePageState extends State<UserHomePage> {
               const SizedBox(height: 24.0),
               buildDateSelector(),
               const SizedBox(height: 24.0),
-              buildDailyActivity()
+              buildDailyActivity(),
+              const SizedBox(height: 24.0),
+              LeaderBoardButton()
             ],
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.redeem),
-            label: 'Earn',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event),
-            label: 'Events',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
+      bottomNavigationBar: UserBottomNavigation()
     );
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'contacts-list.dart';
 import 'redeem.dart';
@@ -14,7 +16,17 @@ class EarnPage extends StatefulWidget {
 class _EarnPageState extends State<EarnPage> {
   int _selectedIndex = 0;
 
-  // Bottom navigation onTap logic
+  // Fetch user's credits from Firestore
+  Future<int> _fetchUserCredits() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return 0; // If no user is logged in, return 0 credits.
+
+    DocumentSnapshot userDoc =
+        await FirebaseFirestore.instance.collection('Users').doc(user.uid).get();
+
+    return userDoc.exists ? userDoc['credits'] ?? 0 : 0;
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -37,13 +49,38 @@ class _EarnPageState extends State<EarnPage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '45 Bucks', // User's credits
-                  style: TextStyle(
-                    color: Colors.purple[400],
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+                FutureBuilder<int>(
+                  future: _fetchUserCredits(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Text(
+                        'Loading...',
+                        style: TextStyle(
+                          color: Colors.purple,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      );
+                    } else if (snapshot.hasError) {
+                      return const Text(
+                        'Error',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      );
+                    } else {
+                      return Text(
+                        '${snapshot.data} Bucks',
+                        style: TextStyle(
+                          color: Colors.purple[400],
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      );
+                    }
+                  },
                 ),
                 const Text(
                   'Available →',
@@ -56,7 +93,6 @@ class _EarnPageState extends State<EarnPage> {
             ),
           ],
         ),
-        // Removed calendar icon from actions
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -67,14 +103,14 @@ class _EarnPageState extends State<EarnPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildNavItem(1, 'Earn', Icons.more_horiz), // 'Earn' instead of 'Home'
+                  _buildNavItem(1, 'Earn', Icons.more_horiz),
                   _buildNavItem(2, 'Redeem', Icons.check_circle_outline),
                   _buildNavItem(3, 'History', Icons.history),
                 ],
               ),
             ),
 
-            // Earn & Win Card (Updated with e-waste terminology)
+            // Earn & Win Card
             Container(
               margin: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -117,89 +153,6 @@ class _EarnPageState extends State<EarnPage> {
                 ),
               ),
             ),
-
-            // Refer & Earn Section
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Refer & Earn BIG',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  RichText(
-                    text: TextSpan(
-                      style: const TextStyle(color: Colors.black87),
-                      children: [
-                        const TextSpan(text: 'Earn '),
-                        TextSpan(
-                          text: '₹200*',
-                          style: TextStyle(
-                            color: Colors.blue[400],
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const TextSpan(
-                          text: ' for every friend who joins the e-waste recycling platform.',
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildShareButton(FontAwesomeIcons.whatsapp, Colors.green), // For WhatsApp
-                      _buildShareButton(Icons.telegram, Colors.blue),
-                      _buildShareButton(Icons.share, Colors.grey),
-                      _buildShareButton(Icons.copy, Colors.grey),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Navigate to contacts page when button is pressed
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ContactsPage(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[100],
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.person, color: Colors.black54),
-                        SizedBox(width: 8),
-                        Text(
-                          'Find in your contacts',
-                          style: TextStyle(color: Colors.black87),
-                        ),
-                        Spacer(),
-                        Icon(Icons.arrow_forward, color: Colors.black54),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -209,23 +162,10 @@ class _EarnPageState extends State<EarnPage> {
         backgroundColor: Colors.blue[100],
         onTap: _onItemTapped,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home), 
-            label: 'Home',
-            backgroundColor: Colors.black
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore), 
-            label: 'Explore'
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.save), 
-            label: 'Redeem'
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person), 
-            label: 'Profile'
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
+          BottomNavigationBarItem(icon: Icon(Icons.save), label: 'Redeem'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
@@ -307,16 +247,4 @@ class _EarnPageState extends State<EarnPage> {
       ),
     );
   }
-
-  Widget _buildShareButton(IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(icon, color: color),
-    );
-  }
 }
-

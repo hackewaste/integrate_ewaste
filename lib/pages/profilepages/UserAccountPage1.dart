@@ -1,16 +1,34 @@
 
 import 'package:ewaste/data/services/auth_service.dart';
-import 'package:ewaste/presentations/user/home/userHomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:ewaste/pages/profilepages/UserAccPage2.dart';
 import 'package:ewaste/pages/profilepages/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:ewaste/presentations/user/home/userHomePage.dart';
-import 'package:ewaste/data/services/auth_service.dart';
 import 'package:ewaste/pages/login.dart';
 import 'package:ewaste/pages/user_credits.dart';
 import 'package:ewaste/pages/profilepages/activitylog.dart';
 import 'package:ewaste/pages/profilepages/helpsupport.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'User Profile',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const UserAccountPage(title:' User Profile'),
+    );
+  }
+}
 
 class UserAccountPage extends StatefulWidget {
   const UserAccountPage({super.key, required this.title});
@@ -242,7 +260,7 @@ _buildOptionTile(
 
                 // Clear entire navigation stack and go to Login page
                 Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => Login()),
+                  MaterialPageRoute(builder: (context) => LoginPage()),
                   (Route<dynamic> route) => false, // Removes all previous routes
                 );
               } catch (e) {
@@ -489,7 +507,7 @@ class SettingsPage extends StatelessWidget {
 
                 // Clear entire navigation stack and go to Login page
                 Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => Login()),
+                  MaterialPageRoute(builder: (context) => LoginPage()),
                   (Route<dynamic> route) => false, // Removes all previous routes
                 );
               } catch (e) {

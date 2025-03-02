@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:ewaste/pages/login.dart'; // Ensure this is correct
 
 class GamificationScreen extends StatefulWidget {
   @override
@@ -11,11 +12,11 @@ class _GamificationScreenState extends State<GamificationScreen> {
   void initState() {
     super.initState();
 
-    // Wait for 5 seconds, then navigate to the next screen
-    Future.delayed(Duration(seconds: 5), () {
+    // Wait for 5 seconds, then navigate to the login screen
+    Future.delayed(Duration(seconds: 60), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => NextScreen()), // Change to your actual next screen
+        MaterialPageRoute(builder: (context) => LoginPage()), // Navigate to Login
       );
     });
   }
@@ -44,7 +45,7 @@ class _GamificationScreenState extends State<GamificationScreen> {
                   Expanded(
                     child: Center(
                       child: Image.asset(
-                        'assets/logo.png', // Ensure this exists
+                        'assets/logo.png', // Ensure this image exists in assets
                         width: 250,
                       ),
                     ),
@@ -98,22 +99,6 @@ class _GamificationScreenState extends State<GamificationScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// Replace this with the actual next screen
-class NextScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Text(
-          'Next Screen',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
       ),
     );
   }

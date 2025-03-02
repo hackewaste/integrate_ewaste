@@ -1,5 +1,6 @@
 
 import 'package:ewaste/data/services/detection_billing_services.dart';
+import 'package:ewaste/pages/landing.dart';
 import 'package:ewaste/pages/profilepages/UserAccountPage1.dart';
 import 'package:ewaste/presentations/volunteer/home/VolunteerHome.dart';
 import 'package:ewaste/pages/dropimageai(working).dart';
@@ -7,7 +8,9 @@ import 'package:ewaste/pages/info.dart';
 import 'package:ewaste/pages/login.dart';
 import 'package:ewaste/pages/struserhome.dart';
 import 'package:ewaste/pages/onboarding1.dart';
-
+import 'package:ewaste/presentations/user/recycling_steps/computer_waste_recycling_process.dart';
+import 'package:ewaste/presentations/user/recycling_steps/recycling_dashboard.dart';
+import 'package:ewaste/presentations/user/recycling_steps/recycling_steps_timeline.dart';
 import 'package:ewaste/presentations/user/DisposalLocation/disposal_locations_page.dart';
 import 'package:ewaste/presentations/user/detection/detection_page.dart';
 import 'package:ewaste/presentations/user/home/userHomePage.dart';
@@ -42,7 +45,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'EcoElectronic',
       debugShowCheckedModeBanner: false,
-      home: Login(),
+      home: GamificationScreen(),
       theme: ThemeData(
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,

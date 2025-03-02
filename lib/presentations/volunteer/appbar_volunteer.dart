@@ -1,3 +1,4 @@
+import 'package:ewaste/pages/NotificationPage.dart';
 import 'package:flutter/material.dart';
 
 class AppbarVolunteer extends StatelessWidget implements PreferredSizeWidget{
@@ -18,7 +19,11 @@ class AppbarVolunteer extends StatelessWidget implements PreferredSizeWidget{
         IconButton(
           icon: const Icon(Icons.notifications),
           onPressed: () {
-
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => NotificationPage()),
+            );
           },
         ),
       ],

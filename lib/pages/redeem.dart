@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-
-class AppColors {
-  static const Color primaryColor = Color(0xFF4CAF50);
-  static const Color backgroundColor = Color(0xFFF5F5F5);
-  static const Color white = Colors.white;
-  static const Color textColor = Colors.black87;
-  static const Color buttonColor = Color(0xFF388E3C);
-}
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'history.dart';
 
 class RewardsScreen extends StatefulWidget {
   @override
@@ -14,26 +9,44 @@ class RewardsScreen extends StatefulWidget {
 }
 
 class _RewardsScreenState extends State<RewardsScreen> {
-  int _selectedIndex = 2;
-  int availableCredits = 2500;
+  int userCredits = 0;
 
-  final List<Map<String, dynamic>> vouchers = [
-    {"logo": "assets/amazon.png", "couponCode": "AMZ100", "creditsRequired": 1000},
-    {"logo": "assets/flipkart.png", "couponCode": "FLIP500", "creditsRequired": 2000},
-    {"logo": "assets/swiggy.png", "couponCode": "SWIGGY250", "creditsRequired": 1500},
-    {"logo": "assets/zomato.png", "couponCode": "ZOMATO300", "creditsRequired": 1800},
-    {"logo": "assets/myntra.png", "couponCode": "MYNTRA200", "creditsRequired": 1200},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserCredits();
+  }
 
-  void _redeemVoucher(int requiredCredits, String couponCode) {
-    if (availableCredits < requiredCredits) {
+  Future<void> _fetchUserCredits() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    DocumentSnapshot userDoc =
+        await FirebaseFirestore.instance.collection('Users').doc(user.uid).get();
+
+    if (userDoc.exists) {
+      setState(() {
+        userCredits = userDoc['credits'] ?? 0;
+      });
+    }
+  }
+
+  Future<void> _redeemVoucher(int requiredCredits, String couponCode) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    if (userCredits < requiredCredits) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Not enough credits!"), backgroundColor: Colors.red),
       );
       return;
     }
 
-    setState(() => availableCredits -= requiredCredits);
+    await FirebaseFirestore.instance.collection('Users').doc(user.uid).update({
+      'credits': userCredits - requiredCredits,
+    });
+
+    setState(() => userCredits -= requiredCredits);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Coupon Redeemed: $couponCode"), backgroundColor: Colors.green),
@@ -43,70 +56,49 @@ class _RewardsScreenState extends State<RewardsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Rewards", style: TextStyle(color: AppColors.white)),
-        backgroundColor: AppColors.primaryColor,
+        title: Text("Rewards", style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.purple[400],
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: _fetchUserCredits,
+          ),
+        ],
       ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text("Available Credits: $availableCredits", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Text("Available Credits: $userCredits", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: vouchers.length,
-              itemBuilder: (context, index) {
-                return VoucherCard(
-                  logo: vouchers[index]['logo'],
-                  couponCode: vouchers[index]['couponCode'],
-                  creditsRequired: vouchers[index]['creditsRequired'],
-                  onRedeem: () => _redeemVoucher(vouchers[index]['creditsRequired'], vouchers[index]['couponCode']),
-                );
-              },
+            child: ListView(
+              children: [
+                _buildVoucherCard("Amazon", "assets/amazon.png", "AMZ100", 1000),
+                _buildVoucherCard("Flipkart", "assets/flipkart.png", "FLIP500", 2000),
+                _buildVoucherCard("Swiggy", "assets/swiggy.png", "SWIGGY250", 1500),
+                _buildVoucherCard("Zomato", "assets/zomato.png", "ZOMATO300", 1800),
+                _buildVoucherCard("Myntra", "assets/myntra.png", "MYNTRA200", 1200),
+              ],
             ),
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) => setState(() => _selectedIndex = index),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: "History"),
-          BottomNavigationBarItem(icon: Icon(Icons.card_giftcard), label: "Rewards"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-        ],
-      ),
     );
   }
-}
 
-class VoucherCard extends StatelessWidget {
-  final String logo;
-  final String couponCode;
-  final int creditsRequired;
-  final VoidCallback onRedeem;
-
-  const VoucherCard({
-    required this.logo,
-    required this.couponCode,
-    required this.creditsRequired,
-    required this.onRedeem,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildVoucherCard(String name, String logo, String couponCode, int creditsRequired) {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
         leading: Image.asset(logo, width: 50, height: 50),
-        title: Text("Coupon: $couponCode", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text("$name Coupon: $couponCode", style: TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text("Credits Required: $creditsRequired"),
         trailing: ElevatedButton(
-          onPressed: onRedeem,
-          style: ElevatedButton.styleFrom(backgroundColor: AppColors.buttonColor),
+          onPressed: () => _redeemVoucher(creditsRequired, couponCode),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.purple[400]),
           child: Text("Redeem"),
         ),
       ),
