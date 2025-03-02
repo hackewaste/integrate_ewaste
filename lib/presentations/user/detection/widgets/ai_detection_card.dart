@@ -58,7 +58,7 @@ class _AIDetectionCardState extends State<AIDetectionCard> {
 
     var provider = Provider.of<SelectedItemsProvider>(context, listen: false);
     var request = http.MultipartRequest(
-        "POST", Uri.parse("https://ca47-34-48-156-24.ngrok-free.app/predict"));
+        "POST", Uri.parse("https://https://66de-34-106-156-87.ngrok-free.app//predict"));
 
     try {
       for (var image in _selectedImages) {

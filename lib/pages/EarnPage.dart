@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../presentations/user/user_bottom_navigation.dart';
 import 'contacts-list.dart';
 import 'redeem.dart';
 import 'history.dart';
@@ -156,6 +157,7 @@ class _EarnPageState extends State<EarnPage> {
           ],
         ),
       ),
+<<<<<<< HEAD
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
@@ -168,6 +170,9 @@ class _EarnPageState extends State<EarnPage> {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
+=======
+        bottomNavigationBar: UserBottomNavigation(currentIndex: 2,)
+>>>>>>> 220571d6d8dc5cae23cca353664c8e98f2429829
     );
   }
 

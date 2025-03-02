@@ -1,7 +1,9 @@
 import 'package:ewaste/pages/EarnPage.dart';
 import 'package:ewaste/presentations/user/home/widgets/collaboration.dart';
 import 'package:ewaste/presentations/user/home/widgets/disposal_widget.dart';
+import 'package:ewaste/presentations/user/home/widgets/drawer.dart';
 import 'package:ewaste/presentations/user/home/widgets/leaderboard_button.dart';
+import 'package:ewaste/presentations/user/home/widgets/resale_section.dart';
 import 'package:ewaste/presentations/user/user_appbar.dart';
 import 'package:ewaste/presentations/user/user_bottom_navigation.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +41,7 @@ class _UserHomePageState extends State<UserHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: UserAppbar(),
-      drawer: const Drawer(),
+      drawer: UserDrawer(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -63,6 +65,8 @@ class _UserHomePageState extends State<UserHomePage> {
               const SizedBox(height: 24.0),
               OverallStatisticsSection(),
               const SizedBox(height: 24.0),
+              ResaleSection(),
+              const SizedBox(height: 24.0),
               buildDateSelector(),
               const SizedBox(height: 24.0),
               buildDailyActivity(),
@@ -72,7 +76,7 @@ class _UserHomePageState extends State<UserHomePage> {
           ),
         ),
       ),
-      bottomNavigationBar: UserBottomNavigation()
+      bottomNavigationBar: UserBottomNavigation(currentIndex: 0,)
     );
   }
 }

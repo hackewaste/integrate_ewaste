@@ -1,6 +1,8 @@
+
+import 'package:ewaste/presentations/volunteer/requests/requestmap.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ewaste/data/services/volunteer_service.dart';
 
 class VolunteerRequestsPage extends StatefulWidget {
@@ -17,8 +19,8 @@ class _VolunteerRequestsPageState extends State<VolunteerRequestsPage> {
       appBar: AppBar(title: const Text("Available Pickup Requests")),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('requests') // Replace with your Firestore collection
-            .where('status', isEqualTo: 'pending') // Filter by pending status
+            .collection('requests')
+            .where('status', isEqualTo: 'pending')
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -33,7 +35,6 @@ class _VolunteerRequestsPageState extends State<VolunteerRequestsPage> {
             return {
               'id': doc.id,
               'totalCredits': doc['totalCredits'],
-              // Add other fields as needed
             };
           }).toList();
 
@@ -41,16 +42,50 @@ class _VolunteerRequestsPageState extends State<VolunteerRequestsPage> {
             itemCount: requests.length,
             itemBuilder: (context, index) {
               var request = requests[index];
-              return Card(
-                margin: const EdgeInsets.all(10),
-                child: ListTile(
-                  title: Text("Request ID: ${request['id']}"),
-                  subtitle: Text("Credits: ${request['totalCredits']}"),
-                  trailing: ElevatedButton(
-                    onPressed: () => _acceptRequest(request['id']),
-                    child: const Text("Accept"),
-                  ),
-                ),
+              // NEW FUNCTION: Fetch user's name from requestId
+              Future<String> _fetchUsernameFromRequestId(String requestId) async {
+                try {
+                  DocumentSnapshot requestDoc = await FirebaseFirestore.instance
+                      .collection('requests')
+                      .doc(requestId)
+                      .get();
+
+                  if (requestDoc.exists) {
+                    String userId = requestDoc['userId']; // Assuming 'userId' exists in the request document
+
+                    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+                        .collection('Users')
+                        .doc(userId)
+                        .get();
+
+                    if (userDoc.exists) {
+                      return userDoc['name']; // Fetch the user's name from Users collection
+                    }
+                  }
+                } catch (e) {
+                  print("Error fetching username: $e");
+                }
+                return "Unknown User"; // Default fallback
+              }
+
+              // NEW CODE: Fetch username from requestId
+              return FutureBuilder<String>(
+                future: _fetchUsernameFromRequestId(request['id']),
+                builder: (context, userSnapshot) {
+                  String username = userSnapshot.data ?? "Unknown User"; // Default if not found
+
+                  return Card(
+                    margin: const EdgeInsets.all(10),
+                    child: ListTile(
+                      title: Text("User: $username"),
+                      subtitle: Text("Credits: ${request['totalCredits']}"), // Updated UI
+                      trailing: ElevatedButton(
+                        onPressed: () => _acceptRequest(request['id']),
+                        child: const Text("Accept"),
+                      ),
+                    ),
+                  );
+                },
               );
             },
           );
@@ -60,7 +95,7 @@ class _VolunteerRequestsPageState extends State<VolunteerRequestsPage> {
   }
 
   Future<void> _acceptRequest(String requestId) async {
-    User? user = FirebaseAuth.instance.currentUser; // Get logged-in volunteer
+    User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Not logged in! Please sign in first.")),
@@ -68,11 +103,10 @@ class _VolunteerRequestsPageState extends State<VolunteerRequestsPage> {
       return;
     }
 
-    String volunteerId = user.uid; // Firebase UID
-    String? volunteerName = user.displayName; // Get name if set
+    String volunteerId = user.uid;
+    String? volunteerName = user.displayName;
 
     if (volunteerName == null) {
-      // Fetch from Firestore if `displayName` is not available
       volunteerName = await _volunteerService.getVolunteerName(volunteerId);
     }
 
@@ -85,6 +119,14 @@ class _VolunteerRequestsPageState extends State<VolunteerRequestsPage> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Request Accepted!")),
+      );
+
+      // **Navigate to RequestMapPage after accepting**
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RequestMap(requestId: requestId),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

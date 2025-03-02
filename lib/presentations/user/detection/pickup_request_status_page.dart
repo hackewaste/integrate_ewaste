@@ -1,3 +1,4 @@
+import 'package:ewaste/presentations/user/detection/widgets/OTPSection.dart';
 import 'package:ewaste/presentations/user/detection/widgets/request_summary_card.dart';
 import 'package:ewaste/presentations/user/detection/widgets/status_section.dart';
 import 'package:flutter/material.dart';
@@ -98,7 +99,9 @@ class _PickupRequestStatusPageState extends State<PickupRequestStatusPage> {
           const SizedBox(height: 20),
 
           /// 📦 **Order Summary Card**
-          SummaryCard(requestId: widget.requestId)  // Pass requestId here
+          SummaryCard(requestId: widget.requestId),
+          const SizedBox(height: 20),
+          OTPSection(requestId: widget.requestId),// Pass requestId here
 
         ],
       ),
