@@ -3,6 +3,7 @@ import 'package:ewaste/presentations/user/home/widgets/collaboration.dart';
 import 'package:ewaste/presentations/user/home/widgets/disposal_widget.dart';
 import 'package:ewaste/presentations/user/home/widgets/drawer.dart';
 import 'package:ewaste/presentations/user/home/widgets/leaderboard_button.dart';
+import 'package:ewaste/presentations/user/home/widgets/resale_section.dart';
 import 'package:ewaste/presentations/user/user_appbar.dart';
 import 'package:ewaste/presentations/user/user_bottom_navigation.dart';
 import 'package:flutter/material.dart';
@@ -64,6 +65,8 @@ class _UserHomePageState extends State<UserHomePage> {
               ColabSection(context),
               const SizedBox(height: 24.0),
               OverallStatisticsSection(),
+              const SizedBox(height: 24.0),
+              ResaleSection(),
               const SizedBox(height: 24.0),
               buildDateSelector(),
               const SizedBox(height: 24.0),
