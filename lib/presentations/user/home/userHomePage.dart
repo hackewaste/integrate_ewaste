@@ -1,6 +1,7 @@
 import 'package:ewaste/pages/EarnPage.dart';
 import 'package:ewaste/presentations/user/home/widgets/collaboration.dart';
 import 'package:ewaste/presentations/user/home/widgets/disposal_widget.dart';
+import 'package:ewaste/presentations/user/home/widgets/drawer.dart';
 import 'package:ewaste/presentations/user/home/widgets/leaderboard_button.dart';
 import 'package:ewaste/presentations/user/user_appbar.dart';
 import 'package:ewaste/presentations/user/user_bottom_navigation.dart';
@@ -39,7 +40,7 @@ class _UserHomePageState extends State<UserHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: UserAppbar(),
-      drawer: const Drawer(),
+      drawer: UserDrawer(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
