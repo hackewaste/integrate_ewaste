@@ -18,7 +18,7 @@ class _RequestMapState extends State<RequestMap> {
   LatLng? _volunteerLocation;
   String? userName;
   String? address;
-  String? itemName;
+  List<Map<String, dynamic>> eWasteItems = [];
   int? quantity;
   int? creditPoints;
 
@@ -67,9 +67,7 @@ class _RequestMapState extends State<RequestMap> {
         setState(() {
           userName = userNameFetched;
           address = requestData['pickupAddress']['address'];
-          itemName = requestData['eWasteItems']
-              .map((item) => item['name'])
-              .join(', ');
+          eWasteItems = List<Map<String, dynamic>>.from(requestData['eWasteItems']);
           quantity = requestData['eWasteItems'].length;
           creditPoints = requestData['totalCredits'];
           _userLocation = LatLng(
@@ -89,58 +87,175 @@ class _RequestMapState extends State<RequestMap> {
       appBar: AppBar(title: Text("Volunteer Request")),
       body: _userLocation == null
           ? Center(child: CircularProgressIndicator())
-          : Padding(
+          : SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // User Information
+            Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("User: ${userName ?? 'Loading...'}",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
-                  Text("Address: ${address ?? 'Loading...'}",
-                      style: TextStyle(color: Colors.blueAccent)),
-                  SizedBox(height: 12),
-                  Text("E-Waste Item: ${itemName ?? 'Loading...'}",
-                      style: TextStyle(fontSize: 16)),
-                  Text("Quantity: ${quantity ?? 'Loading...'}"),
-                  Text("Credit Points: ${creditPoints ?? 'Loading...'}"),
-                  SizedBox(height: 20),
-                  Expanded(
-                    child: FlutterMap(
-                      options: MapOptions(
-                        center: _userLocation!,
-                        zoom: 15.0,
+              child: Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Icon(Icons.person, color: Colors.blueAccent, size: 30),
+                      SizedBox(width: 10),
+                      Text(
+                        userName ?? "Loading...",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                       ),
-                      children: [
-                        TileLayer(
-                          urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                          subdomains: ['a', 'b', 'c'],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Address Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.location_on, color: Colors.red, size: 30),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          address ?? "Loading...",
+                          style: TextStyle(fontSize: 16, color: Colors.black87),
                         ),
-                        MarkerLayer(
-                          markers: [
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+
+            // Item Details
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "E-Waste Items",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 10),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: eWasteItems.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            leading: Icon(Icons.devices, color: Colors.green),
+                            title: Text(eWasteItems[index]['name']),
+                            subtitle: Text("Category: ${eWasteItems[index]['category']}"),
+                          );
+                        },
+                      ),
+                      Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _infoBadge(Icons.shopping_cart, "Quantity", quantity.toString()),
+                          _infoBadge(Icons.credit_score, "Credits", creditPoints.toString()),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+
+            // Map Section (Decent size)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: SizedBox(
+                  height: 250, // Good visibility of the map
+                  child: FlutterMap(
+                    options: MapOptions(
+                      center: _userLocation!,
+                      zoom: 15.0,
+                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                        subdomains: ['a', 'b', 'c'],
+                      ),
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            width: 50.0,
+                            height: 50.0,
+                            point: _userLocation!,
+                            child: Icon(Icons.location_pin, color: Colors.red, size: 40),
+                          ),
+                          if (_volunteerLocation != null)
                             Marker(
                               width: 50.0,
                               height: 50.0,
-                              point: _userLocation!,
-                              child: Icon(Icons.location_pin, color: Colors.red, size: 40),
+                              point: _volunteerLocation!,
+                              child: Icon(Icons.person_pin_circle, color: Colors.blue, size: 40),
                             ),
-                            if (_volunteerLocation != null)
-                              Marker(
-                                width: 50.0,
-                                height: 50.0,
-                                point: _volunteerLocation!,
-                                child: Icon(Icons.person_pin_circle, color: Colors.blue, size: 40),
-                              ),
-                          ],
-                        ),
-                      ],//9hm6
-                    ),
+                        ],
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 20),
-                  ReachedButton(requestId: widget.requestId),
-                ],
+                ),
               ),
             ),
+            SizedBox(height: 20),
+
+            // Reached Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Center(
+                child: ReachedButton(requestId: widget.requestId),
+              ),
+            ),
+            const SizedBox(height: 20,)
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Badge Widget for Quantity and Credits
+  Widget _infoBadge(IconData icon, String title, String? value) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade100,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.blue),
+          SizedBox(width: 5),
+          Text("$title: ", style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(value ?? "0", style: TextStyle(color: Colors.black87)),
+        ],
+      ),
     );
   }
 }
