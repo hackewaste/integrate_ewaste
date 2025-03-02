@@ -12,9 +12,9 @@ class StatusSection extends StatelessWidget {
         return Colors.orange;
       case "assigned":
         return Colors.blue;
-      case "picked":
+      case "verified":
         return Colors.purple;
-      case "completed":
+      case "pickedup":
         return Colors.green;
       default:
         return Colors.grey;
@@ -27,9 +27,9 @@ class StatusSection extends StatelessWidget {
         return Icons.pending_actions;
       case "assigned":
         return Icons.assignment_ind;
-      case "picked":
+      case "verfied":
         return Icons.local_shipping;
-      case "completed":
+      case "pickedup":
         return Icons.check_circle;
       default:
         return Icons.help_outline;
