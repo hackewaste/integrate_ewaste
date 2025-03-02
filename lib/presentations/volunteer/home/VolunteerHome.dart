@@ -1,6 +1,7 @@
 
 import 'package:ewaste/presentations/volunteer/appbar_volunteer.dart';
 import 'package:ewaste/presentations/volunteer/home/widgets/location_widget.dart';
+import 'package:ewaste/presentations/volunteer/home/widgets/voldrawer.dart';
 import 'package:ewaste/presentations/volunteer/requests/volunteer_requests_page.dart';
 import 'package:flutter/material.dart';
 
@@ -35,7 +36,7 @@ class _VolunteerHomePage1 extends State<VolunteerHomePage1> {
       appBar: AppbarVolunteer(
 
       ),
-      drawer: const Drawer(),
+      drawer: const VolDrawer(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
