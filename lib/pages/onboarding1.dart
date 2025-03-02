@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:ewaste/presentations/user/home/userHomePage.dart';
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  const OnboardingScreen({super.key, required String userId});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -14,19 +14,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<OnboardingPage> _pages = [
     OnboardingPage(
-      image: "assets/logo.png",
+      image: "assets/onboarding2.png",
       title: "Easy E-Waste Collection",
       description:
           "Schedule pickups hassle-free and dispose of your e-waste responsibly.",
     ),
     OnboardingPage(
-      image: "assets/logo.png",
+      image: "assets/onboarding1.png",
       title: "Earn Rewards While Recycling",
       description:
           "Recycle e-waste and earn points that can be redeemed for exclusive rewards.",
     ),
     OnboardingPage(
-      image: "assets/logo.png",
+      image: "assets/onboarding3.png",
       title: "Track Your Environmental Impact",
       description:
           "Monitor your carbon footprint reduction and contribute to a greener planet.",
@@ -183,7 +183,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.green[700],
+                      color: const Color.fromARGB(255, 195, 255, 198),
                       height: 1.2,
                     ),
                   ),

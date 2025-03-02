@@ -21,22 +21,23 @@ class _RealTimeLeaderboardState extends State<RealTimeLeaderboard> {
     _listenToUserCredits();
   }
 
-   void _listenToUserCredits() {
-    // ✅ Fetch usercredits and update leaderboard in real-time
-    _firestore.collection('usercredits').snapshots().listen((snapshot) {
+  void _listenToUserCredits() {
+    _firestore.collection('Users').snapshots().listen((snapshot) {
       setState(() {
         _userCredits = snapshot.docs.map((doc) {
           var data = doc.data();
-          // Ensure uid, username, and credits are available
           return {
             'uid': doc.id,
-            'username': data['username'] ?? 'Unknown', // Ensure username exists
-            'credits': data['credits'] ?? 0,
+            'name': data['name'] ?? 'Unknown', // ✅ Fetching correct name field
+            'credits': data['credits'] ?? 0, // ✅ Fetching credits
           };
         }).toList();
-        
-        // ✅ Sort by credits in descending order
+
+        // ✅ Sort by credits in descending order and keep only top 5
         _userCredits.sort((a, b) => (b['credits']).compareTo(a['credits']));
+        if (_userCredits.length > 5) {
+          _userCredits = _userCredits.sublist(0, 5);
+        }
       });
     });
   }
@@ -78,11 +79,18 @@ class _RealTimeLeaderboardState extends State<RealTimeLeaderboard> {
                         showTitles: true,
                         getTitlesWidget: (value, meta) {
                           if (value.toInt() < _userCredits.length) {
-                            // ✅ Display the username on the X-axis
-                            final name = _userCredits[value.toInt()]['username'] ?? 'Unknown';
+                            final user = _userCredits[value.toInt()];
+                            final name = user['name'] ?? 'Unknown';
+
+                            // 🏆 Trophy for #1, ⭐ Star for others
+                            String icon = value.toInt() == 0 ? '🏆 ' : '⭐ ';
+
                             return Transform.rotate(
                               angle: -0.5,
-                              child: Text(name, style: const TextStyle(fontSize: 12)),
+                              child: Text(
+                                '$icon$name',
+                                style: const TextStyle(fontSize: 12),
+                              ),
                             );
                           }
                           return const SizedBox.shrink();

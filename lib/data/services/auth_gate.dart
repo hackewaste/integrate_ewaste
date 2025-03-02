@@ -32,7 +32,7 @@ class AuthGate extends StatelessWidget {
                     } else if (volunteerSnapshot.hasData && volunteerSnapshot.data!.exists) {
                       return VolunteerHomePage1();
                     } else {
-                      return Login();
+                      return LoginPage();
                     }
                   },
                 );
@@ -40,7 +40,7 @@ class AuthGate extends StatelessWidget {
             },
           );
         } else {
-          return Login();
+          return LoginPage();
         }
       },
     );
